@@ -1,0 +1,142 @@
+/* Main Container */
+.container {
+    width: 640px;
+    margin: 100px auto;
+    background: white;
+    color: black;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border-radius: 10px;
+    padding: 40px 50px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+/* Fade-in Animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Headings */
+.container h1, .instructions h1 {
+    font-size: 30px;
+    font-weight: 700;
+    text-align: center;
+    color: black;
+    transition: color 0.3s;
+}
+
+.container h1:hover { color: #00234f; }
+
+.container h2 { font-size: 27px; font-weight: 600; text-align: center; }
+
+/* Horizontal Line */
+.container hr { height: 2px; border: none; background: #505050; border-radius: 5px; }
+
+/* Question Options */
+.container ul { padding: 0; list-style: none; }
+
+.container ul li {
+    display: flex;
+    align-items: center;
+    height: 70px;
+    padding-left: 15px;
+    border: 2px solid #505050;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 20px;
+    font-weight: 500;
+    background: white;
+    cursor: pointer;
+    transition: background 0.3s, border-color 0.3s;
+}
+
+.container ul li:hover { background: #dfe6f2; border-color: #00234f; }
+
+/* Answer Styles */
+.correct, .wrong {
+    color: white;
+    animation: pulse 0.4s;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.correct { background: #137c21 !important; border-color: #137c21 !important; }
+.wrong { background: #137c21 !important; border-color: #137c21 !important; }
+
+/* Buttons */
+.container button, .start-btn {
+    margin: auto;
+    width: 250px;
+    height: 65px;
+    background: #00234f;
+    color: white;
+    font-size: 25px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    box-shadow: 0px 4px 8px rgba(0, 35, 79, 0.3);
+}
+
+.container button:hover, .start-btn:hover {
+    background: #001a3d;
+    box-shadow: 0px 6px 12px rgba(0, 35, 79, 0.5);
+}
+
+.container button:active, .start-btn:active {
+    background: #000f2b;
+    transform: scale(0.98);
+}
+
+/* Instructions Section */
+.instructions {
+    background: #f5f5f5;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+.instructions p, .instructions ul li {
+    font-size: 18px;
+    color: black;
+    font-weight: 500;
+}
+
+.instructions ul {
+    text-align: left;
+    margin: 20px auto;
+    width: 80%;
+    padding-left: 20px;
+}
+
+/* Final Score */
+.final-score {
+    font-size: 50px;
+    font-weight: 700;
+    color: black;
+    background: #ffd700;
+    padding: 20px;
+    border-radius: 10px;
+    display: inline-block;
+    margin: 20px auto;
+    box-shadow: 0px 4px 12px rgba(255, 215, 0, 0.5);
+    animation: fadeIn 0.8s;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container { width: 90%; padding: 30px; }
+    .container button { width: 200px; height: 55px; font-size: 22px; }
+    .instructions ul { width: 100%; }
+}

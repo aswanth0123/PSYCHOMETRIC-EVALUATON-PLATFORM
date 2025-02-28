@@ -1,0 +1,22 @@
+.test-card {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    width: 150px;
+    text-align: center;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .test-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .test-btn:hover {
+    background: #0056b3;
+  }
+  

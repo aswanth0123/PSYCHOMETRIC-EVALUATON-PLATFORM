@@ -1,0 +1,149 @@
+/* AuthForm.css */
+
+/* Center the entire auth container */
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f9f9f9;
+  padding: 20px;
+}
+
+/* Style the form box */
+.form-container {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+/* Toggle button container */
+.form-toggle {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* Style buttons */
+.form-toggle button {
+  background: none;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s ease;
+  color: #555;
+}
+
+.form-toggle .active {
+  font-weight: bold;
+  color: #007bff;
+  border-bottom: 2px solid #007bff;
+}
+
+/* Form inputs */
+.form input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Input focus styles */
+.form input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Error state */
+.error {
+  color: #e74c3c;
+  font-size: 0.875rem;
+  text-align: left;
+  margin-top: -8px;
+  margin-bottom: 10px;
+}
+
+.form input.error {
+  border-color: #e74c3c;
+  box-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
+}
+
+/* Submit button */
+.form button {
+  width: 100%;
+  padding: 12px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.form button:hover {
+  background: #0056b3;
+}
+
+/* Back to Home button */
+.btn-secondary {
+  display: block;
+  margin-top: 10px;
+  padding: 10px;
+  background: #ccc;
+  color: black;
+  text-decoration: none;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.btn-secondary:hover {
+  background: #bbb;
+}
+
+/* Gender Container: Display radio buttons horizontally */
+.gender-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.gender-container label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #555;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .form-container {
+    padding: 1.5rem;
+    max-width: 90%;
+  }
+
+  .form-toggle button {
+    font-size: 14px;
+  }
+
+  .form button {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .error {
+    font-size: 0.8rem;
+  }
+}
