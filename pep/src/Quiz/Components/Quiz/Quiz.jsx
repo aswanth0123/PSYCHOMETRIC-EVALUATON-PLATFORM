@@ -67,6 +67,10 @@ const Quiz = () => {
     return "Invalid Score";
   };
 
+  const book = () =>{
+    navigate('../appointment')
+  }
+  
   return (
     <div className='container'>
       {!start ? (
@@ -110,7 +114,7 @@ const Quiz = () => {
           <h2>Performance: <span className="performance-message">{getPerformanceMessage(score)}</span></h2>
           <h2>For detailed insights and guidance, <h1>Get in touch with our Expert NOW!!</h1></h2>
           <button onClick={reset}>Go to Dashboard</button>
-          <button>Book an Appointment</button>
+          <button onClick={book}>Book an Appointment</button>
         </>
       )}
     </div>

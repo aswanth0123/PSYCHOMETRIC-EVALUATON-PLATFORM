@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for redirection
 import { Link } from "react-router-dom";
 import "./Authform.css"; // Import CSS file
-
+import axios from 'axios'
 export default function AuthForm() {
     const [isLogin, setIsLogin] = useState(true); // Toggle between login & signup
     const [formData, setFormData] = useState({
-        firstName: "",
-        lastName: "",
+        first_name: "",
+        last_name: "",
         dob: "",
         gender: "",
         contactNumber: "",
@@ -15,8 +15,13 @@ export default function AuthForm() {
         password: "",
     });
     const [errors, setErrors] = useState({});
-    const navigate = useNavigate(); // Hook for navigation
-
+    const [candidate,setCandidate] = useState("");
+    const navigate = useNavigate(); // Hook to navigate programmatically
+    useEffect(() => {
+      axios.get('http://127.0.0.1:8000/api/cadidate/')
+          .then(response => setCandidate(response.data))
+          .catch(error => console.log(error));
+    }, []);
     // Handle input change
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -38,11 +43,11 @@ export default function AuthForm() {
 
         if (!isLogin) {
             // Signup-specific validation
-            if (!formData.firstName || !/^[a-zA-Z]+$/.test(formData.firstName)) {
-                newErrors.firstName = "First Name should only contain alphabets.";
+            if (!formData.first_name || !/^[a-zA-Z]+$/.test(formData.first_name)) {
+                newErrors.first_name = "First Name should only contain alphabets.";
             }
-            if (!formData.lastName || !/^[a-zA-Z]+$/.test(formData.lastName)) {
-                newErrors.lastName = "Last Name should only contain alphabets.";
+            if (!formData.last_name || !/^[a-zA-Z]+$/.test(formData.last_name)) {
+                newErrors.last_name = "Last Name should only contain alphabets.";
             }
             if (!formData.gender) {
                 newErrors.gender = "Gender is required.";
@@ -65,19 +70,38 @@ export default function AuthForm() {
             setErrors({});
 
             if (isLogin) {
-                // Mock authentication (Replace this with API call)
-                const validEmail = "test@example.com";
-                const validPassword = "password";
+               
+                candidate.map(user=>{
+                    if(user.email === formData.email && user.password === formData.password) {
+                        navigate("/dashboard")
+                        sessionStorage.setItem("user", JSON.stringify(user));
+                    }  })
 
-                if (formData.email === validEmail && formData.password === validPassword) {
-                    alert("Login successful!");
-                    navigate("/dashboard"); // Redirect to dashboard
-                } else {
-                    setErrors({ email: "Invalid email or password." });
-                }
+                // if (formData.email === validEmail && formData.password === validPassword) {
+                //     alert("Login successful!");
+
+                //     navigate("/dashboard"); // Redirect to dashboard
+                // } else {
+                //     setErrors({ email: "Invalid email or password." });
+                // }
             } else {
-                alert("Signup successful! Redirecting to login...");
-                setIsLogin(true);
+                // const {first_name,last_name,dob,gender,contact_no,email,password} = formData
+                // axios.post('http://localhost:8000/api/cadidate/', {first_name, last_name ,dob,gender,contact_no,email,password })
+                axios.post('http://localhost:8000/api/cadidate/', formData)
+                .then(response => {
+                    console.log(response.data);
+                    setFormData({first_name: "",
+                        last_name: "",
+                        dob: "",
+                        gender: "",
+                        contactNumber: "",
+                        email: "",
+                        password: ""})
+                        alert("Signup successful! Redirecting to login...");
+                        setIsLogin(true);       
+                })
+                .catch(error => console.log(error));
+                
             }
         }
     };
@@ -95,11 +119,11 @@ export default function AuthForm() {
 
                     {!isLogin && (
                         <>
-                            <input type="text" name="firstName" placeholder="First Name" value={formData.firstName} onChange={handleChange} />
-                            {errors.firstName && <p className="error">{errors.firstName}</p>}
+                            <input type="text" name="first_name" placeholder="First Name" value={formData.first_name} onChange={handleChange} />
+                            {errors.first_name && <p className="error">{errors.first_name}</p>}
 
-                            <input type="text" name="lastName" placeholder="Last Name" value={formData.lastName} onChange={handleChange} />
-                            {errors.lastName && <p className="error">{errors.lastName}</p>}
+                            <input type="text" name="last_name" placeholder="Last Name" value={formData.last_name} onChange={handleChange} />
+                            {errors.last_name && <p className="error">{errors.last_name}</p>}
 
                             <input type="date" name="dob" value={formData.dob} onChange={handleChange} />
                             {errors.dob && <p className="error">{errors.dob}</p>}
