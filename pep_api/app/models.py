@@ -12,7 +12,7 @@ class Psychologist(models.Model):
     certifications = models.TextField()
 
 class Candidates(models.Model):
-    fisrt_name = models.TextField()
+    first_name = models.TextField()
     last_name = models.TextField()
     dob = models.DateField()
     gender =  models.TextField()

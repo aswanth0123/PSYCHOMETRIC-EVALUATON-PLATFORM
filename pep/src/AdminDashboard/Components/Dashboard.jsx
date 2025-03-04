@@ -1,8 +1,8 @@
 import React, { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
+import axios from "axios";
 import TestCard from "./Testcard";
-import axios from 'axios'
 import {
   FaCheckCircle,
   FaClipboardList,
@@ -12,43 +12,38 @@ import {
 } from "react-icons/fa";
 import "../styles/Dashboard.css";
 
-const Dashboard = () => {
+const AdminDashboard = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
   const [result,setResult] = useState([])
   const [appoiments,setAppoiments] = useState([])
+  const [upcomingCount, setUpcomingCount] = useState(0);
+
+  useEffect(() => {
+    const fetchUpcomingAppointments = async () => {
+      try {
+        const response = await axios.get("http://127.0.0.1:8000/api/appointments/upcoming/count/");
+        setUpcomingCount(response.data.count);
+      } catch (error) {
+        console.error("Error fetching upcoming appointment count:", error);
+      }
+    };
+
+    fetchUpcomingAppointments();
+  }, []);
   const navigate = useNavigate();
-  const loggedInUser = JSON.parse(sessionStorage.getItem("user"));
-  const candidateId = loggedInUser?.id;
   useEffect(() => {
     axios
       .get("http://127.0.0.1:8000/api/test-evaluation/")
-      .then((response) => {
-        if (Array.isArray(response.data)) {
-          // Filter only the logged-in candidate's test evaluations
-          const filteredData = response.data.filter(
-            (item) => item.CANDIDATE_ID === candidateId
-          );
-          setResult(filteredData);
-        }
-      })
+      .then((response) => (setResult(response.data)))
       .catch((error) => console.log("Error fetching test evaluations:", error));
-  }, [candidateId]); 
+  },[]); 
   useEffect(() => {
     axios
       .get("http://127.0.0.1:8000/api/appoiments/")
-      .then((response) => {
-        if (Array.isArray(response.data)) {
-          // Filter only the logged-in candidate's test evaluations
-          const filteredData = response.data.filter(
-            (item) => item.CANDIDATE_ID === candidateId
-          );
-          setAppoiments(filteredData);
-        }
-      })
+      .then((response) => (setAppoiments(response.data)))
       .catch((error) => console.log("Error fetching test evaluations:", error));
-  }, [candidateId]); 
+  },[]); 
   console.log(result);
-  
   const tests = [
     { id: 1, name: "Emotional Intelligence Test" },
     { id: 2, name: "Verbal Reasoning Test" },
@@ -69,7 +64,7 @@ const Dashboard = () => {
           <div className="dashboard-header">
             <div className="banner welcome-banner">
               <h1>
-                Welcome, <span className="user-name">Candidate!</span> 👋
+                Welcome, <span className="user-name">Admin!</span> 👋
               </h1>
               <p>Your psychometric journey!</p>
             </div>
@@ -87,7 +82,11 @@ const Dashboard = () => {
               <div className="overview-card">
                 <FaCalendarAlt className="overview-icon" />
                 <h3>Next Appointment</h3>
-                <p>No scheduled appointments</p>
+                {upcomingCount > 0 ? (
+                    <p>You have {upcomingCount} upcoming appointment(s)</p>
+                  ) : (
+                    <p>No upcoming appointments</p>
+                  )}
               </div>
             </div>
           </div>
@@ -115,13 +114,11 @@ const Dashboard = () => {
               <h1>📑 My Results</h1>
               <p>View and analyze your test results.</p>
             </div>
-            
-                {/* <p>Access your test results and progress.</p>
-                <button className="reports-btn">View</button> */}
-                <table className="table" width="100%" border="1">
+            <table className="table" width="100%" border="1">
                   <thead>
                     <tr>
                       <th>TEST NAME</th>
+                      <th>Candidate Name</th>
                       <th>TEST_EVALUATION</th>
                     </tr>
                   </thead>
@@ -131,6 +128,7 @@ const Dashboard = () => {
                       
                       <tr key={item.TEST_EVALUATION_ID}>
                         <th>{item.test_name}</th>
+                        <th>{item.candidate_name}</th>
                         <th>{item.TEST_EVALUATION}</th>
                       </tr>
                     ))
@@ -149,15 +147,15 @@ const Dashboard = () => {
         {activeSection === "appointments" && (
           <section className="appointments-section">
             <div className="appointments-banner">
-              <h1>📅 My Appointments</h1>
-              <p>Schedule consultations with our expert</p>
+              <h1>📅 Appointments</h1>
             </div>
-          
+            
             <table className="table" width="100%" border="1">
                   <thead>
                     <tr>
                       <th>APPOINTMENT_ID</th>
                       <th>PSYCHOLOGIST NAME</th>
+                      <th>CANDIDATE NAME</th>
                       <th>TEST NAME</th>
                       <th>TEST RESULT</th>
                       <th>TIME SLOT</th>
@@ -169,8 +167,10 @@ const Dashboard = () => {
                       
                       <tr key={item.APPOINTMENT_ID}>
                         <th>{item.TEST_ID}</th>
-
                         <th>{item.psychologist_name}</th>
+
+                        <th>{item.candidate_name}</th>
+
                         <th>{item.test_name}</th>
                         <th>{item.test_result}</th>
                         <th>{item.TIME_SLOT}</th>
@@ -183,7 +183,7 @@ const Dashboard = () => {
                   )}
                   </tbody>
                 </table>
-
+         
           </section>
         )}
 
@@ -233,4 +233,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default AdminDashboard;

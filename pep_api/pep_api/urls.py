@@ -25,10 +25,15 @@ router.register(r'candidate', Candidatesview, basename='cadidate')
 router.register(r'test-details', TestDetailsViewSet)
 router.register(r'test-evaluation', TestEvaluationViewSet)
 router.register(r'appoiments', AppoimentsViewsets)
+# router.register(r'userdata', UserViewSet,basename='user')
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path("api/appointments/upcoming/count/", upcoming_appointment_count, name="upcoming-appointment-count"),
+    path('api/login/', login_user, name='login_user'),
+
+
 
 ]

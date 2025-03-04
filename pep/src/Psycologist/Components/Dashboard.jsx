@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
+import axios from "axios";
 import TestCard from "./Testcard";
 import {
   FaCheckCircle,
@@ -13,8 +14,23 @@ import "../styles/Dashboard.css";
 
 const P_Dashboard = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
-  const navigate = useNavigate();
+  const [result,setResult] = useState([])
+  const [appoiments,setAppoiments] = useState([])
 
+  const navigate = useNavigate();
+  useEffect(() => {
+    axios
+      .get("http://127.0.0.1:8000/api/test-evaluation/")
+      .then((response) => (setResult(response.data)))
+      .catch((error) => console.log("Error fetching test evaluations:", error));
+  },[]); 
+  useEffect(() => {
+    axios
+      .get("http://127.0.0.1:8000/api/appoiments/")
+      .then((response) => (setAppoiments(response.data)))
+      .catch((error) => console.log("Error fetching test evaluations:", error));
+  },[]); 
+  console.log(result);
   const tests = [
     { id: 1, name: "Emotional Intelligence Test" },
     { id: 2, name: "Verbal Reasoning Test" },
@@ -35,7 +51,7 @@ const P_Dashboard = () => {
           <div className="dashboard-header">
             <div className="banner welcome-banner">
               <h1>
-                Welcome, <span className="user-name">Candidate!</span> 👋
+                Welcome, <span className="user-name">psychologist!</span> 👋
               </h1>
               <p>Your psychometric journey!</p>
             </div>
@@ -81,13 +97,32 @@ const P_Dashboard = () => {
               <h1>📑 My Results</h1>
               <p>View and analyze your test results.</p>
             </div>
-            <div className="card-list">
-              <div className="custom-card">
-                <h3>View Results</h3>
-                <p>Access your test results and progress.</p>
-                <button className="reports-btn">View</button>
-              </div>
-            </div>
+            <table className="table" width="100%" border="1">
+                  <thead>
+                    <tr>
+                      <th>TEST NAME</th>
+                      <th>Candidate Name</th>
+                      <th>TEST_EVALUATION</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  {result.length > 0 ? (
+                    result.map((item) => (
+                      
+                      <tr key={item.TEST_EVALUATION_ID}>
+                        <th>{item.test_name}</th>
+                        <th>{item.candidate_name}</th>
+                        <th>{item.TEST_EVALUATION}</th>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <th colSpan="4">No data available</th>
+                    </tr>
+                  )}
+                  </tbody>
+                </table>
+              
           </section>
         )}
 
@@ -95,21 +130,40 @@ const P_Dashboard = () => {
         {activeSection === "appointments" && (
           <section className="appointments-section">
             <div className="appointments-banner">
-              <h1>📅 My Appointments</h1>
-              <p>Schedule consultations with our expert</p>
+              <h1>📅 Appointments</h1>
             </div>
-            <div className="card-list">
-              <div className="custom-card">
-                <h3>Book an Appointment</h3>
-                <p>Schedule a consultation with our expert.</p>
-                <button
-                  onClick={() => navigate("/appointment")}
-                  className="appointment-btn"
-                >
-                  Book now
-                </button>
-              </div>
-            </div>
+            
+            <table className="table" width="100%" border="1">
+                  <thead>
+                    <tr>
+                      <th>APPOINTMENT_ID</th>
+                      <th>CANDIDATE NAME</th>
+                      <th>TEST NAME</th>
+                      <th>TEST RESULT</th>
+                      <th>TIME SLOT</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  {appoiments.length > 0 ? (
+                    appoiments.map((item) => (
+                      
+                      <tr key={item.APPOINTMENT_ID}>
+                        <th>{item.TEST_ID}</th>
+
+                        <th>{item.candidate_name}</th>
+                        <th>{item.test_name}</th>
+                        <th>{item.test_result}</th>
+                        <th>{item.TIME_SLOT}</th>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <th colSpan="4">No data available</th>
+                    </tr>
+                  )}
+                  </tbody>
+                </table>
+         
           </section>
         )}
 

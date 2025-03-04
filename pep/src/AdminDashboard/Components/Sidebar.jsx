@@ -7,8 +7,10 @@ const Sidebar = ({ setActiveSection }) => {
   const navigate = useNavigate(); // Initialize useNavigate
 
   const handleLogout = () => {
-    sessionStorage.removeItem("user");
+    // Clear any user-related data (if applicable, like localStorage, session, etc.)
+    // localStorage.clear(); // Example for clearing local storage
 
+    // Redirect to the homepage (or login page, depending on your app)
     navigate("/"); // Redirects to the homepage ("/")
   };
 
@@ -42,7 +44,6 @@ const Sidebar = ({ setActiveSection }) => {
           <FaCommentDots className="sidebar-icon" />
           <span>Feedback</span>
         </li>
-
       </ul>
       
       

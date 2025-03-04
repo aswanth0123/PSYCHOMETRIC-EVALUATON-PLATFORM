@@ -42,6 +42,8 @@ const Quiz = () => {
   const next = () => {
     if (lock === true) {
       if (index === data.length - 1) {
+        sessionStorage.setItem("quiz", 2);
+
         storeResult(); 
         setResult(true);
         return;

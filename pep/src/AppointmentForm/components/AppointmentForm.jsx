@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios"; // Import Axios
+import axios from "axios"; // ✅ Import Axios
 import "../styles/AppointmentForm.css"; // Importing CSS
 
 const AppointmentForm = () => {
@@ -11,7 +11,7 @@ const AppointmentForm = () => {
 
   // Psychologist & Test details (Modify based on actual data)
   const psychologistId = 1; // Replace with dynamic data if needed
-  const testId = 1; // Replace with actual Test ID
+  const testId = sessionStorage.getItem("quiz"); // Replace with actual Test ID
   const testEvaluationId = 1; // Replace with actual Evaluation ID
 
   // Generate next 7 days for booking
@@ -47,8 +47,20 @@ const AppointmentForm = () => {
     }
 
     // Combine date & time into a single format
-    const timeSlot = `${selectedDate} ${selectedTime}`;
-
+    // const timeSlot = `${selectedDate} ${selectedTime}`;
+    const formatTimeToISO = (date, time) => {
+      const [timeValue, meridian] = time.split(" ");
+      let [hours, minutes] = timeValue.split(":").map(Number);
+    
+      if (meridian === "PM" && hours !== 12) hours += 12;
+      if (meridian === "AM" && hours === 12) hours = 0;
+    
+      const formattedTime = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:00`;
+      return `${date}T${formattedTime}Z`; // Convert to ISO 8601 format
+    };
+    
+    const timeSlot = formatTimeToISO(selectedDate, selectedTime);
+    
     const appointmentData = {
       PSYCHOLOGIST_ID: psychologistId,
       CANDIDATE_ID: JSON.parse(sessionStorage.getItem("user")).id,
@@ -57,27 +69,25 @@ const AppointmentForm = () => {
       TIME_SLOT: timeSlot,
     };
 
-    // try {
-      const response = await fetch("http://localhost:8000/api/appoiments/", {
-        method: "POST",
-        headers: {
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/appoiments/", // ✅ Backend API Endpoint
+        appointmentData,
+        {
+          headers: {
             "Content-Type": "application/json",
-        },
-        body: JSON.stringify(appointmentData),
-    });
-      // const response = await axios.post("http://localhost:8000/api/appoiments/", appointmentData, {
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      // });
+          },
+        }
+      );
+
       console.log("Appointment Created:", response.data);
       setConfirmationMessage(
-        `Appointment successfully booked for Candidate ID 1 with Dr. Psychologist on ${selectedDate} at ${selectedTime}.`
+        `Appointment successfully booked for Candidate ID ${appointmentData.CANDIDATE_ID} with Dr. Psychologist on ${selectedDate} at ${selectedTime}.`
       );
-    // } catch (error) {
-    //   console.error("Error creating appointment:", error.response?.data || error.message);
-    //   alert("Failed to create appointment. Please try again.");
-    // }
+    } catch (error) {
+      console.error("Error creating appointment:", error.response?.data || error.message);
+      alert("Failed to create appointment. Please try again.");
+    }
   };
 
   return (
@@ -90,7 +100,7 @@ const AppointmentForm = () => {
 
       {/* Appointment Form */}
       <form onSubmit={handleSubmit} className="appointment-form">
-        <h3>Candidate ID: 1</h3>
+        <h3>Candidate ID: {JSON.parse(sessionStorage.getItem("user")).id}</h3>
 
         {/* Date Selection */}
         <h3>Select a Date</h3>

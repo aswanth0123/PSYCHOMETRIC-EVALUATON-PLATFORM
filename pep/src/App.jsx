@@ -13,6 +13,8 @@ import Dashboard from "./CandidateDashboard/Components/Dashboard";
 import Login from "./Login";
 import LandingPage from './LandingPage';
 import P_Dashboard from './Psycologist/Components/Dashboard';
+import AdminLogin from './AdminLogin';
+import AdminDashboard from './AdminDashboard/Components/Dashboard';
 function App() {
   return (
     <Router>
@@ -31,6 +33,8 @@ function App() {
           <Route path="/appointment" element={<Appointment />} />
           <Route path="/test/:testId" element={<TestDetails />} />
           <Route path="/psychologist" element={<P_Dashboard />} />
+          <Route path="/admin" element={<AdminLogin/>}/>
+          <Route path='/AdminDashboard' element={<AdminDashboard/>}/>
 
         </Routes>
       </div>

@@ -47,7 +47,7 @@ const Quiz = () => {
   const next = () => {
     if (lock) {
       if (index === data.length - 1) {
-        
+        sessionStorage.setItem("quiz", 1);
         storeResult();  // Automatically store result before finishing test
         setResult(true);
         return;
