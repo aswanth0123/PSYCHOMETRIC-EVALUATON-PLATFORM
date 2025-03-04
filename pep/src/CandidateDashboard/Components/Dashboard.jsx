@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import TestCard from "./Testcard";
+import axios from 'axios'
 import {
   FaCheckCircle,
   FaClipboardList,
@@ -13,8 +14,26 @@ import "../styles/Dashboard.css";
 
 const Dashboard = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
+  const [result,setResult] = useState([])
   const navigate = useNavigate();
-
+  const loggedInUser = JSON.parse(sessionStorage.getItem("user"));
+  const candidateId = loggedInUser?.id;
+  useEffect(() => {
+    axios
+      .get("http://127.0.0.1:8000/api/test-evaluation/")
+      .then((response) => {
+        if (Array.isArray(response.data)) {
+          // Filter only the logged-in candidate's test evaluations
+          const filteredData = response.data.filter(
+            (item) => item.CANDIDATE_ID === candidateId
+          );
+          setResult(filteredData);
+        }
+      })
+      .catch((error) => console.log("Error fetching test evaluations:", error));
+  }, [candidateId]); 
+  console.log(result);
+  
   const tests = [
     { id: 1, name: "Emotional Intelligence Test" },
     { id: 2, name: "Verbal Reasoning Test" },
@@ -81,13 +100,33 @@ const Dashboard = () => {
               <h1>📑 My Results</h1>
               <p>View and analyze your test results.</p>
             </div>
-            <div className="card-list">
-              <div className="custom-card">
-                <h3>View Results</h3>
-                <p>Access your test results and progress.</p>
-                <button className="reports-btn">View</button>
-              </div>
-            </div>
+            
+                {/* <p>Access your test results and progress.</p>
+                <button className="reports-btn">View</button> */}
+                <table className="table" width="100%" border="1">
+                  <thead>
+                    <tr>
+                      <th>TEST NAME</th>
+                      <th>TEST_EVALUATION</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  {result.length > 0 ? (
+                    result.map((item) => (
+                      
+                      <tr key={item.TEST_EVALUATION_ID}>
+                        <th>{item.TEST_ID}</th>
+                        <th>{item.TEST_EVALUATION}</th>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <th colSpan="4">No data available</th>
+                    </tr>
+                  )}
+                  </tbody>
+                </table>
+              
           </section>
         )}
 

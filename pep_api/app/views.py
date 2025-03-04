@@ -9,7 +9,18 @@ class Psychologistview(viewsets.ModelViewSet):
     serializer_class = PsycologistSerializer
 
 
-class Cadidatesview(viewsets.ModelViewSet):
-    queryset = Cadidates.objects.all()
+class Candidatesview(viewsets.ModelViewSet):
+    queryset = Candidates.objects.all()
     serializer_class = CadidatesSerializer
     
+class TestDetailsViewSet(viewsets.ModelViewSet):
+    queryset = TestDetails.objects.all()
+    serializer_class = TestDetailsSerializer
+
+class TestEvaluationViewSet(viewsets.ModelViewSet):
+    queryset = TestEvaluation.objects.all()
+    serializer_class = TestEvaluationSerializer
+
+class AppoimentsViewsets(viewsets.ModelViewSet):
+    queryset = AppointmentsTable.objects.all()
+    serializer_class = AppointmentsSerializer

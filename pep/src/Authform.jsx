@@ -18,7 +18,7 @@ export default function AuthForm() {
     const [candidate,setCandidate] = useState("");
     const navigate = useNavigate(); // Hook to navigate programmatically
     useEffect(() => {
-      axios.get('http://127.0.0.1:8000/api/cadidate/')
+      axios.get('http://127.0.0.1:8000/api/candidate/')
           .then(response => setCandidate(response.data))
           .catch(error => console.log(error));
     }, []);
@@ -87,7 +87,7 @@ export default function AuthForm() {
             } else {
                 // const {first_name,last_name,dob,gender,contact_no,email,password} = formData
                 // axios.post('http://localhost:8000/api/cadidate/', {first_name, last_name ,dob,gender,contact_no,email,password })
-                axios.post('http://localhost:8000/api/cadidate/', formData)
+                axios.post('http://localhost:8000/api/candidate/', formData)
                 .then(response => {
                     console.log(response.data);
                     setFormData({first_name: "",

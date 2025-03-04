@@ -1,19 +1,24 @@
 import React, { useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import axios from "axios"; // Import Axios
 import "../styles/AppointmentForm.css"; // Importing CSS
 
-const AppointmentForm = ({ candidateName }) => {
+const AppointmentForm = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [confirmationMessage, setConfirmationMessage] = useState("");
+  const navigate = useNavigate();
 
-  const navigate = useNavigate(); // Hook for navigation
+  // Psychologist & Test details (Modify based on actual data)
+  const psychologistId = 1; // Replace with dynamic data if needed
+  const testId = 1; // Replace with actual Test ID
+  const testEvaluationId = 1; // Replace with actual Evaluation ID
 
   // Generate next 7 days for booking
   const generateDates = () => {
     const dates = [];
     const today = new Date();
-    for (let i = 0; i < 7; i++) {
+    for (let i = 1; i <= 7; i++) {
       const date = new Date(today);
       date.setDate(today.getDate() + i);
       dates.push(date.toISOString().split("T")[0]); // Format: YYYY-MM-DD
@@ -33,17 +38,46 @@ const AppointmentForm = ({ candidateName }) => {
     "6:00 PM",
   ];
 
-  // Handle form submission
-  const handleSubmit = (e) => {
+  // Handle form submission (Send to API)
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedDate || !selectedTime) {
       alert("Please select a date and time.");
       return;
     }
 
-    setConfirmationMessage(
-      `Appointment booked for Candidate with Dr. Psychologist on ${selectedDate} at ${selectedTime}.`
-    );
+    // Combine date & time into a single format
+    const timeSlot = `${selectedDate} ${selectedTime}`;
+
+    const appointmentData = {
+      PSYCHOLOGIST_ID: psychologistId,
+      CANDIDATE_ID: JSON.parse(sessionStorage.getItem("user")).id,
+      TEST_ID: testId,
+      TEST_EVALUATION_ID: testEvaluationId,
+      TIME_SLOT: timeSlot,
+    };
+
+    // try {
+      const response = await fetch("http://localhost:8000/api/appoiments/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(appointmentData),
+    });
+      // const response = await axios.post("http://localhost:8000/api/appoiments/", appointmentData, {
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      // });
+      console.log("Appointment Created:", response.data);
+      setConfirmationMessage(
+        `Appointment successfully booked for Candidate ID 1 with Dr. Psychologist on ${selectedDate} at ${selectedTime}.`
+      );
+    // } catch (error) {
+    //   console.error("Error creating appointment:", error.response?.data || error.message);
+    //   alert("Failed to create appointment. Please try again.");
+    // }
   };
 
   return (
@@ -56,7 +90,7 @@ const AppointmentForm = ({ candidateName }) => {
 
       {/* Appointment Form */}
       <form onSubmit={handleSubmit} className="appointment-form">
-        <h3>Candidate: {candidateName}</h3>
+        <h3>Candidate ID: 1</h3>
 
         {/* Date Selection */}
         <h3>Select a Date</h3>
@@ -96,14 +130,12 @@ const AppointmentForm = ({ candidateName }) => {
         <button type="submit" className="submit-btn">
           Book Appointment
         </button>
-
-        
       </form>
 
-        {/* Back to Dashboard Button */}
-        <button onClick={() => navigate('/dashboard')} className="back-btn">
-          Back to Dashboard
-        </button>
+      {/* Back to Dashboard Button */}
+      <button onClick={() => navigate("/dashboard")} className="back-btn">
+        Back to Dashboard
+      </button>
 
       {/* Confirmation Message */}
       {confirmationMessage && <p className="confirmation-message">{confirmationMessage}</p>}

@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Quiz.css';
+import axios from 'axios';
 import { data } from '../../assets/(VR)test';
 
 const Quiz = () => {
@@ -30,10 +31,18 @@ const Quiz = () => {
       }
     }
   };
-
+  const storeResult = async () => {
+    await axios.post("http://127.0.0.1:8000/api/test-evaluation/", {
+      CANDIDATE_ID:JSON.parse(sessionStorage.getItem("user")).id , 
+      TEST_ID: 2,        
+      TEST_EVALUATION: `Score: ${score}/${data.length}, Performance: ${getPerformanceMessage(score)}`
+    });
+    console.log("Test result saved successfully!");
+};
   const next = () => {
     if (lock === true) {
       if (index === data.length - 1) {
+        storeResult(); 
         setResult(true);
         return;
       }
@@ -68,6 +77,9 @@ const Quiz = () => {
     return "Invalid Score";
   };
   
+  const book = () => {
+    navigate('/appointment');
+  };
 
   return (
     <div className='container'>
@@ -112,7 +124,7 @@ const Quiz = () => {
           <h2>Performance: <span className="performance-message">{getPerformanceMessage(score)}</span></h2>
           <h2>For detailed insights and guidance, <h1>Get in touch with our Expert NOW!!</h1></h2>
           <button onClick={reset}>Go to Dashboard</button>
-          <button>Book an Appointment</button>
+          <button onClick={book}>Book an Appointment</button>
         </>
       )}
     </div>

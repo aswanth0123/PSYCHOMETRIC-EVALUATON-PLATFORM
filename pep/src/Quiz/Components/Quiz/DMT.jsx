@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Quiz.css';
 import { data } from '../../assets/(DMT)test';
+import axios from 'axios';
 
 const DMT = () => {
   let [index, setIndex] = useState(0);
@@ -32,10 +33,18 @@ const DMT = () => {
       }
     }
   };
-
+  const storeResult = async () => {
+    await axios.post("http://127.0.0.1:8000/api/test-evaluation/", {
+      CANDIDATE_ID:JSON.parse(sessionStorage.getItem("user")).id , 
+      TEST_ID: 6,        
+      TEST_EVALUATION: `Score: ${score}/${data.length}, Performance: ${getPerformanceMessage(score)}`
+    });
+    console.log("Test result saved successfully!");
+};
   const next = () => {
     if (lock === true) {
       if (index === data.length - 1) {
+        storeResult();
         setResult(true);
         return;
       }

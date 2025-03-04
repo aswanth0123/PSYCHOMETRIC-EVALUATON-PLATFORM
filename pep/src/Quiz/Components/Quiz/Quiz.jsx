@@ -1,5 +1,6 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './Quiz.css';
 import { data } from '../../assets/(EI)test';
 
@@ -9,47 +10,59 @@ const Quiz = () => {
   let [lock, setLock] = useState(false);
   let [score, setScore] = useState(0);
   let [result, setResult] = useState(false);
-  let [start, setStart] = useState(false); // New state for start screen
+  let [start, setStart] = useState(false); // Start screen state
 
   let Option1 = useRef(null);
   let Option2 = useRef(null);
   let Option3 = useRef(null);
   let Option4 = useRef(null);
-
   let option_array = [Option1, Option2, Option3, Option4];
 
+  const navigate = useNavigate(); // Initialize navigate
+
+  // Function to check answer
   const checkAns = (e, ans) => {
-    if (lock === false) {
+    if (!lock) {
       if (question.ans === ans) {
         e.target.classList.add('correct');
-        setLock(true);
         setScore((prev) => prev + 1);
       } else {
         e.target.classList.add('wrong');
-        setLock(true);
       }
+      setLock(true);
     }
   };
 
+  // Function to store result automatically
+  const storeResult = async () => {
+      await axios.post("http://127.0.0.1:8000/api/test-evaluation/", {
+        CANDIDATE_ID:JSON.parse(sessionStorage.getItem("user")).id , 
+        TEST_ID: 1,        
+        TEST_EVALUATION: `Score: ${score}/${data.length}, Performance: ${getPerformanceMessage(score)}`
+      });
+      console.log("Test result saved successfully!");
+  };
+
+  // Function to handle next question
   const next = () => {
-    if (lock === true) {
+    if (lock) {
       if (index === data.length - 1) {
+        
+        storeResult();  // Automatically store result before finishing test
         setResult(true);
         return;
       }
       setIndex(++index);
       setQuestion(data[index]);
       setLock(false);
-      option_array.map((option) => {
+      option_array.forEach((option) => {
         option.current.classList.remove('wrong');
         option.current.classList.remove('correct');
-        return null;
       });
     }
   };
 
-  const navigate = useNavigate(); // Initialize navigate
-
+  // Function to reset quiz and go to dashboard
   const reset = () => {
     setIndex(0);
     setQuestion(data[0]);
@@ -59,6 +72,8 @@ const Quiz = () => {
     setStart(false);
     navigate('/dashboard'); // Navigate to dashboard
   };
+
+  // Function to calculate performance
   const getPerformanceMessage = (score) => {
     if (score >= 0 && score <= 5) return "Poor";
     if (score >= 6 && score <= 10) return "Below Average";
@@ -67,10 +82,10 @@ const Quiz = () => {
     return "Invalid Score";
   };
 
-  const book = () =>{
-    navigate('../appointment')
-  }
-  
+  const book = () => {
+    navigate('/appointment');
+  };
+
   return (
     <div className='container'>
       {!start ? (
@@ -78,13 +93,13 @@ const Quiz = () => {
           <h1>Welcome to the Emotional Intelligence Test</h1>
           <p>Please read the following instructions carefully before starting the test:</p>
           <ol>
-            <li><b>General Instruction:</b> Kindly sit in a peaceful environnment before beginning the test. </li><br></br>
-            <li><b>Time Limit:</b> There is no timer.It is advised to take not more than 2 minutes per Question.</li><br></br>
-            <li><b>Questions Type:</b> The test consists of MCQs designed to assess various aspects of the test.Each Question comprises of four options.</li><br></br>
-            <li><b>Attempt per Question:</b> Once you select an option, it cannot be changed. Please select the option carefully.</li><br></br>
-            <li><b>Navigation:</b> Click the "Next" button to proceed to the next question. There is no option to go back to previous questions.</li><br></br>
-            <li><b>Scoring:</b> Each correct answer contributes to your final score. The total score will be displayed at the end of the test.</li><br></br>
-            <li><b>Results & Insights:</b> Upon completing the test, you will receive a summary of your performance. If you want detailed guidance, you can book an appointment with our experts.</li><br></br>
+            <li><b>General Instruction:</b> Sit in a peaceful environment before beginning the test.</li>
+            <li><b>Time Limit:</b> There is no timer, but take no more than 2 minutes per question.</li>
+            <li><b>Question Type:</b> MCQs designed to assess various aspects of emotional intelligence.</li>
+            <li><b>Attempt per Question:</b> Once you select an option, it cannot be changed.</li>
+            <li><b>Navigation:</b> Click "Next" to proceed. No option to go back.</li>
+            <li><b>Scoring:</b> Each correct answer contributes to your final score.</li>
+            <li><b>Results & Insights:</b> You will receive a summary of your performance after the test.</li>
           </ol>
           <button className="start-btn" onClick={() => setStart(true)}>Begin Test!</button>
         </div>
@@ -95,10 +110,10 @@ const Quiz = () => {
           <h1>{index + 1}. {question.question}</h1>
           <ul>
             <b>
-            <li ref={Option1} onClick={(e) => { checkAns(e, 1); }}>{question.option1}</li>
-            <li ref={Option2} onClick={(e) => { checkAns(e, 2); }}>{question.option2}</li>
-            <li ref={Option3} onClick={(e) => { checkAns(e, 3); }}>{question.option3}</li>
-            <li ref={Option4} onClick={(e) => { checkAns(e, 4); }}>{question.option4}</li>
+              <li ref={Option1} onClick={(e) => { checkAns(e, 1); }}>{question.option1}</li>
+              <li ref={Option2} onClick={(e) => { checkAns(e, 2); }}>{question.option2}</li>
+              <li ref={Option3} onClick={(e) => { checkAns(e, 3); }}>{question.option3}</li>
+              <li ref={Option4} onClick={(e) => { checkAns(e, 4); }}>{question.option4}</li>
             </b>
           </ul>
           <button onClick={next}>
@@ -108,7 +123,7 @@ const Quiz = () => {
         </>
       ) : (
         <>
-          <h1>Congratulations!🎉</h1>
+          <h1>Congratulations! 🎉</h1>
           <h2>You have completed the test.</h2>
           <h2>Your Score: <span className="final-score">{score}/{data.length}</span></h2>
           <h2>Performance: <span className="performance-message">{getPerformanceMessage(score)}</span></h2>

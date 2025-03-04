@@ -6,5 +6,20 @@ class PsycologistSerializer(serializers.ModelSerializer):
         fields = '__all__'
 class CadidatesSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Cadidates
+        model = Candidates
         fields = '__all__'
+    
+class TestDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TestDetails
+        fields = '__all__'
+
+class TestEvaluationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TestEvaluation
+        fields = '__all__'
+
+class AppointmentsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AppointmentsTable
+        fields = '__all__'  

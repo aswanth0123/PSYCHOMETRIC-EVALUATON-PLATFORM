@@ -21,7 +21,12 @@ from app.views import *
 
 router = DefaultRouter()
 router.register(r'psychologist', Psychologistview, basename='psychologist')
-router.register(r'cadidate', Cadidatesview, basename='cadidate')
+router.register(r'candidate', Candidatesview, basename='cadidate')
+router.register(r'test-details', TestDetailsViewSet)
+router.register(r'test-evaluation', TestEvaluationViewSet)
+router.register(r'appoiments', AppoimentsViewsets)
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
