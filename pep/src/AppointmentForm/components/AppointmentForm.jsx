@@ -12,7 +12,7 @@ const AppointmentForm = () => {
   // Psychologist & Test details (Modify based on actual data)
   const psychologistId = 1; // Replace with dynamic data if needed
   const testId = sessionStorage.getItem("quiz"); // Replace with actual Test ID
-  const testEvaluationId = 1; // Replace with actual Evaluation ID
+  const testEvaluationId = sessionStorage.getItem("testEvaluationId"); // Replace with actual Evaluation ID
 
   // Generate next 7 days for booking
   const generateDates = () => {
@@ -71,7 +71,7 @@ const AppointmentForm = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/appoiments/", // ✅ Backend API Endpoint
+        "http://localhost:8000/api/appoiments/", 
         appointmentData,
         {
           headers: {

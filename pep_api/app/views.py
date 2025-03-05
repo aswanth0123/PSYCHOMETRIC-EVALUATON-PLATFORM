@@ -11,7 +11,6 @@ from django.contrib.auth import authenticate
 from django.utils.timezone import now
 from rest_framework.decorators import api_view
 
-
 class LoginSerializer(Serializer):
     username = CharField()
     password = CharField(write_only=True)

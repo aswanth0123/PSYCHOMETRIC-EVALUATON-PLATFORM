@@ -32,11 +32,13 @@ const Quiz = () => {
     }
   };
   const storeResult = async () => {
-    await axios.post("http://127.0.0.1:8000/api/test-evaluation/", {
+    const response = await axios.post("http://127.0.0.1:8000/api/test-evaluation/", {
       CANDIDATE_ID:JSON.parse(sessionStorage.getItem("user")).id , 
       TEST_ID: 4,        
       TEST_EVALUATION: `Score: ${score}/${data.length}, Performance: ${getPerformanceMessage(score)}`
     });
+    const testEvaluationId = response.data.TEST_EVALUATION_ID; // Extract ID from response
+    sessionStorage.setItem("testEvaluationId", testEvaluationId);
     console.log("Test result saved successfully!");
 };
 
