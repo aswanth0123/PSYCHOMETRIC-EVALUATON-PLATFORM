@@ -20,14 +20,19 @@ const P_Dashboard = () => {
   const navigate = useNavigate();
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/api/test-evaluation/")
+      .get("http://localhost:5000/api/test-evaluations/")
       .then((response) => (setResult(response.data)))
       .catch((error) => console.log("Error fetching test evaluations:", error));
   },[]); 
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/api/appoiments/")
-      .then((response) => (setAppoiments(response.data)))
+      .get("http://localhost:5000/api/appointments/")
+      .then((response) =>{
+        if (Array.isArray(response.data)) {
+          const filteredData = response.data.filter(
+            (item) => item.PSYCHOLOGIST_ID === JSON.parse(sessionStorage.getItem("psychologist")).id
+          );
+      } setAppoiments(filteredData)})
       .catch((error) => console.log("Error fetching test evaluations:", error));
   },[]); 
   console.log(result);
@@ -110,8 +115,8 @@ const P_Dashboard = () => {
                     result.map((item) => (
                       
                       <tr key={item.TEST_EVALUATION_ID}>
-                        <th>{item.test_name}</th>
-                        <th>{item.candidate_name}</th>
+                        <th>{item.TEST_NAME}</th>
+                        <th>{item.first_name} {item.last_name}</th>
                         <th>{item.TEST_EVALUATION}</th>
                       </tr>
                     ))

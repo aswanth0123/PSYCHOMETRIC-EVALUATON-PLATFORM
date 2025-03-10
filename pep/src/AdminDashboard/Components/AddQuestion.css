@@ -1,0 +1,25 @@
+.container{
+  width: 90%;
+  display: grid;
+  grid-template-columns: 30% 70%;
+}
+.answer-select{
+  margin-top: 7px;
+  width: 100%;
+  border-radius: 5px;
+  padding: 5px;
+  border: 1px solid #00000033;
+  margin-bottom: 20px;
+}
+.questions-table{
+  width: 100%;
+  border-radius: 5px;
+  padding: 10px;
+}
+.questions-table,th,td{
+  border: 1px solid #00000033;
+  border-collapse: collapse;
+}
+td{
+  text-align: center;
+}

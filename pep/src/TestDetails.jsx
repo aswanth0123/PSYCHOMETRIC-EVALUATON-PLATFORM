@@ -42,7 +42,7 @@ const TestDetails = () => {
         description: 'This test assesses your ability to make effective decisions. It focuses on evaluating your analytical thinking and decision-making process.',
       };
       break;
-    default:
+    default: 
       testDetails = { title: 'Test not found', description: 'Sorry, the test details are unavailable.' };
   }
 

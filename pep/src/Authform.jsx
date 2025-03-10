@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // For navigation
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate for redirection
 import { Link } from "react-router-dom";
 import "./Authform.css"; // Import CSS file
-import axios from "axios";
 
 export default function AuthForm() {
     const [isLogin, setIsLogin] = useState(true); // Toggle between login & signup
     const [formData, setFormData] = useState({
-        first_name: "",
-        last_name: "",
+        firstName: "",
+        lastName: "",
         dob: "",
         gender: "",
         contactNumber: "",
@@ -16,16 +15,8 @@ export default function AuthForm() {
         password: "",
     });
     const [errors, setErrors] = useState({});
-    const [candidates, setCandidates] = useState([]); // Store all candidates
-    const navigate = useNavigate(); // Hook to navigate programmatically
-
-    // Fetch candidates for login validation
-    useEffect(() => {
-        axios
-            .get("http://127.0.0.1:8000/api/candidate/")
-            .then((response) => setCandidates(response.data))
-            .catch((error) => console.log("Error fetching candidates:", error));
-    }, []);
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate(); // Hook for navigation
 
     // Handle input change
     const handleChange = (e) => {
@@ -48,14 +39,11 @@ export default function AuthForm() {
 
         if (!isLogin) {
             // Signup-specific validation
-            if (!formData.first_name || !/^[a-zA-Z]+$/.test(formData.first_name)) {
-                newErrors.first_name = "First Name should only contain alphabets.";
+            if (!formData.firstName || !/^[a-zA-Z]+$/.test(formData.firstName)) {
+                newErrors.firstName = "First Name should only contain alphabets.";
             }
-            if (!formData.last_name || !/^[a-zA-Z]+$/.test(formData.last_name)) {
-                newErrors.last_name = "Last Name should only contain alphabets.";
-            }
-            if (!formData.dob) {
-                newErrors.dob = "Date of birth is required.";
+            if (!formData.lastName || !/^[a-zA-Z]+$/.test(formData.lastName)) {
+                newErrors.lastName = "Last Name should only contain alphabets.";
             }
             if (!formData.gender) {
                 newErrors.gender = "Gender is required.";
@@ -68,7 +56,7 @@ export default function AuthForm() {
     };
 
     // Handle form submission
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const validationErrors = validate();
 
@@ -77,90 +65,62 @@ export default function AuthForm() {
             return;
         }
 
-        setErrors({}); // Clear errors if no validation issues
+        setErrors({});
+        setLoading(true);
 
-        if (isLogin) {
-            // Handle Login
-            const user = candidates.find(
-                (user) => user.email === formData.email && user.password === formData.password
-            );
-            if (user) {
-                sessionStorage.setItem("user", JSON.stringify(user));
-                navigate("/dashboard");
-            } else {
-                setErrors({ email: "Invalid email or password." });
+        try {
+            const endpoint = isLogin 
+                ? "http://localhost:5000/api/auth/login" 
+                : "http://localhost:5000/api/auth/register";
+
+            const response = await fetch(endpoint, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData),
+            });
+
+            const data = await response.json();
+            setLoading(false);
+
+            if (!response.ok) {
+                setErrors({ email: data.error || "Something went wrong" });
+                return;
             }
-        } else {
-            // Handle Signup
-            const postData = {
-                first_name: formData.first_name, // Fixed spelling
-                last_name: formData.last_name,
-                dob: formData.dob, // Ensure it's YYYY-MM-DD
-                gender: formData.gender, // "Male" or "Female"
-                contact_no: formData.contactNumber, // Corrected field name
-                email: formData.email,
-                password: formData.password
-            };
 
-            axios
-                .post("http://localhost:8000/api/candidate/", postData)
-                .then((response) => {
-                    console.log("Signup Success:", response.data);
-                    setFormData({
-                        first_name: "",
-                        last_name: "",
-                        dob: "",
-                        gender: "",
-                        contactNumber: "",
-                        email: "",
-                        password: "",
-                    });
-                    alert("Signup successful! Redirecting to login...");
-                    setIsLogin(true);
-                })
-                .catch((error) => {
-                    console.error("Signup Error:", error.response?.data);
-                    setErrors(error.response?.data || { general: "Signup failed. Please try again." });
-                });
+            if (isLogin) {
+                localStorage.setItem("token", data.token);
+                sessionStorage.setItem("user", JSON.stringify(data.user));
+                alert("Login successful!");
+                navigate("/dashboard"); // Redirect to dashboard
+            } else {
+                alert("Signup successful! Please log in.");
+                setIsLogin(true);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            setLoading(false);
+            setErrors({ email: "Server error, try again later." });
         }
     };
 
     return (
         <div className="auth-container">
             <div className="form-container">
-                {/* Login/Signup Toggle */}
                 <div className="form-toggle">
-                    <button className={isLogin ? "active" : ""} onClick={() => setIsLogin(true)}>
-                        Login
-                    </button>
-                    <button className={!isLogin ? "active" : ""} onClick={() => setIsLogin(false)}>
-                        SignUp
-                    </button>
+                    <button className={isLogin ? "active" : ""} onClick={() => setIsLogin(true)}>Login</button>
+                    <button className={!isLogin ? "active" : ""} onClick={() => setIsLogin(false)}>SignUp</button>
                 </div>
 
-                {/* Form */}
                 <form className="form" onSubmit={handleSubmit}>
                     <h2>{isLogin ? "Login" : "Sign Up"}</h2>
 
                     {!isLogin && (
                         <>
-                            <input
-                                type="text"
-                                name="first_name"
-                                placeholder="First Name"
-                                value={formData.first_name}
-                                onChange={handleChange}
-                            />
-                            {errors.first_name && <p className="error">{errors.first_name}</p>}
+                            <input type="text" name="firstName" placeholder="First Name" value={formData.firstName} onChange={handleChange} />
+                            {errors.firstName && <p className="error">{errors.firstName}</p>}
 
-                            <input
-                                type="text"
-                                name="last_name"
-                                placeholder="Last Name"
-                                value={formData.last_name}
-                                onChange={handleChange}
-                            />
-                            {errors.last_name && <p className="error">{errors.last_name}</p>}
+                            <input type="text" name="lastName" placeholder="Last Name" value={formData.lastName} onChange={handleChange} />
+                            {errors.lastName && <p className="error">{errors.lastName}</p>}
 
                             <input type="date" name="dob" value={formData.dob} onChange={handleChange} />
                             {errors.dob && <p className="error">{errors.dob}</p>}
@@ -175,41 +135,21 @@ export default function AuthForm() {
                             </div>
                             {errors.gender && <p className="error">{errors.gender}</p>}
 
-                            <input
-                                type="text"
-                                name="contactNumber"
-                                placeholder="Contact Number"
-                                value={formData.contactNumber}
-                                onChange={handleChange}
-                            />
+                            <input type="text" name="contactNumber" placeholder="Contact Number" value={formData.contactNumber} onChange={handleChange} />
                             {errors.contactNumber && <p className="error">{errors.contactNumber}</p>}
                         </>
                     )}
 
-                    <input
-                        type="email"
-                        name="email"
-                        placeholder="Email"
-                        value={formData.email}
-                        onChange={handleChange}
-                    />
+                    <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} />
                     {errors.email && <p className="error">{errors.email}</p>}
 
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="Password"
-                        value={formData.password}
-                        onChange={handleChange}
-                    />
+                    <input type="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange} />
                     {errors.password && <p className="error">{errors.password}</p>}
 
-                    <button type="submit">{isLogin ? "Login" : "SignUp"}</button>
+                    <button type="submit" disabled={loading}>{loading ? "Processing..." : isLogin ? "Login" : "SignUp"}</button>
                 </form>
 
-                <Link to="/" className="btn btn-secondary">
-                    Back to Home
-                </Link>
+                <Link to="/" className="btn btn-secondary">Back to Home</Link>
             </div>
         </div>
     );

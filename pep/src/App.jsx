@@ -14,7 +14,8 @@ import Login from "./Login";
 import LandingPage from './LandingPage';
 import P_Dashboard from './Psycologist/Components/Dashboard';
 import AdminLogin from './AdminLogin';
-import AdminDashboard from './AdminDashboard/Components/Dashboard';
+import AdminDashboard from './AdminDashboard/Components/Admin';
+import AddQuestion from './AdminDashboard/Components/AddQuestion';
 function App() {
   return (
     <Router>
@@ -35,6 +36,7 @@ function App() {
           <Route path="/psychologist" element={<P_Dashboard />} />
           <Route path="/admin" element={<AdminLogin/>}/>
           <Route path='/AdminDashboard' element={<AdminDashboard/>}/>
+          <Route path="/addquestion" element={<AddQuestion />} />
 
         </Routes>
       </div>

@@ -35,16 +35,20 @@ const Quiz = () => {
 
   // Function to store result automatically
   const storeResult = async () => {
-      const response = await axios.post("http://127.0.0.1:8000/api/test-evaluation/", {
-        CANDIDATE_ID:JSON.parse(sessionStorage.getItem("user")).id , 
-        TEST_ID: 1,        
-        TEST_EVALUATION: `Score: ${score}/${data.length}, Performance: ${getPerformanceMessage(score)}`
-      });
-      const testEvaluationId = response.data.TEST_EVALUATION_ID; // Extract ID from response
-      sessionStorage.setItem("testEvaluationId", testEvaluationId);
-      console.log("Test result saved successfully!");
-  };
+    try {
+        const response = await axios.post("http://localhost:5000/api/test-evaluations/", {
+            CANDIDATE_ID: JSON.parse(sessionStorage.getItem("user")).id,
+            TEST_ID: 1,
+            TEST_EVALUATION: `Score: ${score}/${data.length}, Performance: ${getPerformanceMessage(score)}`
+        });
 
+        const testEvaluationId = response.data.TEST_EVALUATION_ID; // Extract ID from response
+        sessionStorage.setItem("testEvaluationId", testEvaluationId);
+        console.log("Test result saved successfully!");
+    } catch (error) {
+        console.error("Error saving test evaluation:", error.response ? error.response.data : error.message);
+    }
+};
   // Function to handle next question
   const next = () => {
     if (lock) {

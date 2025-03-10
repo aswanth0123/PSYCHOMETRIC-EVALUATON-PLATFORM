@@ -56,39 +56,41 @@ const AppointmentForm = () => {
       if (meridian === "AM" && hours === 12) hours = 0;
     
       const formattedTime = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:00`;
-      return `${date}T${formattedTime}Z`; // Convert to ISO 8601 format
+      return `${date} ${formattedTime}`; // Convert to ISO 8601 format
     };
     
     const timeSlot = formatTimeToISO(selectedDate, selectedTime);
     
     const appointmentData = {
-      PSYCHOLOGIST_ID: psychologistId,
+      PSYCHOLOGIST_ID: 1,
       CANDIDATE_ID: JSON.parse(sessionStorage.getItem("user")).id,
       TEST_ID: testId,
       TEST_EVALUATION_ID: testEvaluationId,
       TIME_SLOT: timeSlot,
     };
+    console.log("Appointment Data being sent:", appointmentData);
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/appoiments/", 
-        appointmentData,
+        "http://localhost:5000/api/appointments/", 
+        appointmentData,  // Ensure this object has the correct fields
         {
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" }
         }
       );
-
-      console.log("Appointment Created:", response.data);
+    
+      console.log("✅ Appointment Created:", response.data);
+    
       setConfirmationMessage(
-        `Appointment successfully booked for Candidate ID ${appointmentData.CANDIDATE_ID} with Dr. Psychologist on ${selectedDate} at ${selectedTime}.`
+        `Appointment successfully booked for Candidate ID ${appointmentData.CANDIDATE_ID} 
+        with Dr. Psychologist on ${appointmentData.TIME_SLOT}.`
       );
+    
     } catch (error) {
-      console.error("Error creating appointment:", error.response?.data || error.message);
+      console.error("❌ Error creating appointment:", error.response?.data || error.message);
       alert("Failed to create appointment. Please try again.");
     }
-  };
+  };    
 
   return (
     <div className="appointment-container">

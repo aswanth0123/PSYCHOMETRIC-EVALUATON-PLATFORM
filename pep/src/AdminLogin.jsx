@@ -1,40 +1,51 @@
-import React, { useState,useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import './Login.css';
-import axios from 'axios'
-const AdminLogin = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
 
+const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(""); // To handle error messages
   const navigate = useNavigate(); // Hook to navigate programmatically
-  const handleLogin = (e) => {
+
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setError(""); // Clear previous errors
 
     try {
-      const response = axios.post("http://127.0.0.1:8000/api/login/", {
-        username,
-        password,
+      const response = await fetch("http://localhost:5000/api/admin/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
       });
 
-    //   setMessage(response.data.message);
-      console.log("Login successful:", response.data);
-      navigate('/AdminDashboard')
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem("token", data.token); // Store token in localStorage
+        alert("Login Successful!");
+        navigate("/AdminDashboard"); // Redirect to Dashboard on successful login
+      } else {
+        setError(data.message || "Invalid credentials");
+      }
     } catch (error) {
-      setMessage("Invalid username or password");
-      console.error("Login error:", error.response?.data || error.message);
+      console.error("Login Error:", error);
+      setError("Something went wrong. Please try again.");
     }
   };
 
   return (
     <div className="login-container">
-      <h2>Login</h2>
+      <h2>Admin Login</h2>
+      {error && <p className="error-message">{error}</p>}
       <form onSubmit={handleLogin}>
         <input
-          type="text"
+          type="email"
           placeholder="Email"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           required
         />
         <input
@@ -50,4 +61,4 @@ const AdminLogin = () => {
   );
 };
 
-export default AdminLogin;
+export default Login;

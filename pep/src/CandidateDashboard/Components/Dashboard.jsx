@@ -18,36 +18,44 @@ const Dashboard = () => {
   const [appoiments,setAppoiments] = useState([])
   const navigate = useNavigate();
   const loggedInUser = JSON.parse(sessionStorage.getItem("user"));
-  const candidateId = loggedInUser?.id;
+  console.log(loggedInUser);
+  
+  const candidateId = loggedInUser.id;
+
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/api/test-evaluation/")
+      .get("http://localhost:5000/api/test-evaluations/")
       .then((response) => {
         if (Array.isArray(response.data)) {
+          console.log(response.data);
+
           // Filter only the logged-in candidate's test evaluations
           const filteredData = response.data.filter(
-            (item) => item.CANDIDATE_ID === candidateId
+            (item) => item.ID === candidateId
           );
           setResult(filteredData);
         }
       })
       .catch((error) => console.log("Error fetching test evaluations:", error));
-  }, [candidateId]); 
-  useEffect(() => {
-    axios
-      .get("http://127.0.0.1:8000/api/appoiments/")
+
+      axios
+      .get("http://localhost:5000/api/appointments/")
       .then((response) => {
         if (Array.isArray(response.data)) {
+          
           // Filter only the logged-in candidate's test evaluations
           const filteredData = response.data.filter(
-            (item) => item.CANDIDATE_ID === candidateId
+            (item) => item.candidate_id === candidateId
           );
           setAppoiments(filteredData);
         }
       })
       .catch((error) => console.log("Error fetching test evaluations:", error));
+
   }, [candidateId]); 
+
   console.log(result);
+
   
   const tests = [
     { id: 1, name: "Emotional Intelligence Test" },
@@ -130,7 +138,7 @@ const Dashboard = () => {
                     result.map((item) => (
                       
                       <tr key={item.TEST_EVALUATION_ID}>
-                        <th>{item.test_name}</th>
+                        <th>{item.TEST_NAME}</th>
                         <th>{item.TEST_EVALUATION}</th>
                       </tr>
                     ))
@@ -168,11 +176,11 @@ const Dashboard = () => {
                     appoiments.map((item) => (
                       
                       <tr key={item.APPOINTMENT_ID}>
-                        <th>{item.TEST_ID}</th>
+                        <th>{item.APPOINTMENT_ID}</th>
 
-                        <th>{item.psychologist_name}</th>
-                        <th>{item.test_name}</th>
-                        <th>{item.test_result}</th>
+                        <th>{item.psychologist_first_name} {item.psychologist_last_name}</th>
+                        <th>{item.TEST_NAME}</th>
+                        <th>{item.TEST_EVALUATION}</th>
                         <th>{item.TIME_SLOT}</th>
                       </tr>
                     ))

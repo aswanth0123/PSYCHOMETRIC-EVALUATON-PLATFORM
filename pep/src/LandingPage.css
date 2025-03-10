@@ -23,6 +23,8 @@ body, html {
 }
 
 .nav {
+    background-color: #2b5b8e;
+
     display: flex;
     justify-content: space-between;
     align-items: center;
