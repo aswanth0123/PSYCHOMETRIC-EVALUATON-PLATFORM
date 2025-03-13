@@ -7,6 +7,7 @@ const AdminDashboard = () => {
   const [tests, setTests] = useState([]);
   const [evaluations, setEvaluations] = useState([]);
   const [appointments, setAppointments] = useState([]);
+  const [payments, setPayments] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -15,17 +16,19 @@ const AdminDashboard = () => {
   }, []);
     const fetchData = async () => {
       try {
-        const [psychologistsRes, testsRes, evaluationsRes, appointmentsRes] = await Promise.all([
+        const [psychologistsRes, testsRes, evaluationsRes, appointmentsRes, paymentsRes] = await Promise.all([
           axios.get("http://localhost:5000/api/psychologists"),
           axios.get("http://localhost:5000/api/tests"),
           axios.get("http://localhost:5000/api/test-evaluations"),
           axios.get("http://localhost:5000/api/appointments"),
+          axios.get("http://localhost:5000/api/payments/"),
         ]);
 
         setPsychologists(psychologistsRes.data);
         setTests(testsRes.data);
         setEvaluations(evaluationsRes.data);
         setAppointments(appointmentsRes.data);
+        setPayments(paymentsRes.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -67,6 +70,7 @@ const AdminDashboard = () => {
         <a href="#manage-appointment">Appoiment Details</a>
         <a href="#manage-doctors">Doctors List</a>
         <a href="#manage-evaluvation">Evaluvation Details</a>
+        <a href="#manage-payments">Payments</a>
         <a href="#settings">Settings</a>
       </nav>
 
@@ -203,6 +207,39 @@ const AdminDashboard = () => {
             </tbody>
           </table>
         </div>
+
+        <div className="section" id="manage-payments">
+          <h2>Payments Details</h2>
+
+          <table className="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Candidate</th>
+                <th>Appoiment ID</th>
+                <th>Payment Method</th>
+                <th>Payment Amount</th>
+                <th>Payment Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {payments.map((pay) => (
+                <tr key={pay.PAYMENT_ID}>
+                  <td>{pay.PAYMENT_ID}</td>
+                  <td>{pay.name}</td>
+                  <td>{pay.APPOINTMENT_ID}</td>
+                  <td>{pay.PAYMENT_METHOD}</td>
+                  <td>{pay.PAYMENT_AMOUNT}</td>
+                  <td>{pay.PAYMENT_DATE}</td>
+
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+
+
         {/* Settings Section */}
         <div className="section" id="settings">
           <h2>Settings</h2>

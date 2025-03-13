@@ -40,7 +40,12 @@ const db = mysql.createPool({
 // ✅ GET API - Fetch All Payments
 router.get("/", async (req, res) => {
   try {
-    const [results] = await db.query("SELECT * FROM payments");
+    const [results] = await db.query(`
+      SELECT p.*, c.first_name, c.last_name as name, psy.PSYCHOLOGIST_FIRST_NAME, psy.PSYCHOLOGIST_LAST_NAME
+      FROM payments p
+      JOIN candidates c ON p.CANDIDATE_ID = c.ID
+      JOIN psychologist_details psy ON p.PSYCHOLOGIST_ID = psy.PSYCHOLOGIST_ID
+    `);
     res.json(results);
   } catch (error) {
     console.error("Database Error:", error);

@@ -19,6 +19,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [testsData, setTestsData] = useState([]);
   const loggedInUser = JSON.parse(sessionStorage.getItem("user"));
+  const [payments, setPayments] = useState([]);
   console.log(loggedInUser);
   
   const candidateId = loggedInUser.id;
@@ -28,7 +29,7 @@ const Dashboard = () => {
       .get("http://localhost:5000/api/test-evaluations/")
       .then((response) => {
         if (Array.isArray(response.data)) {
-          console.log(response.data);
+          // console.log(response.data);
 
           // Filter only the logged-in candidate's test evaluations
           const filteredData = response.data.filter(
@@ -55,6 +56,19 @@ const Dashboard = () => {
 
       axios.get('http://localhost:5000/api/tests/').then((response) => {
           setTestsData(response.data);
+      })
+
+      axios.get('http://localhost:5000/api/payments/').then((response) => {
+        if (Array.isArray(response.data)) {
+          // console.log(response.data);
+
+          // Filter only the logged-in candidate's test evaluations
+          const filteredData = response.data.filter(
+            (item) => item.CANDIDATE_ID === candidateId
+          );
+          setPayments(filteredData);
+        }
+        
       })
 
   }, [candidateId]); 
@@ -140,7 +154,7 @@ const Dashboard = () => {
                     ))
                   ) : (
                     <tr>
-                      <th colSpan="4">No data available</th>
+                      <th colSpan="3">No data available</th>
                     </tr>
                   )}
                   </tbody>
@@ -182,7 +196,7 @@ const Dashboard = () => {
                     ))
                   ) : (
                     <tr>
-                      <th colSpan="4">No data available</th>
+                      <th colSpan="5">No data available</th>
                     </tr>
                   )}
                   </tbody>
@@ -200,15 +214,38 @@ const Dashboard = () => {
               </h1>
               <p>Manage your transactions and view payment history.</p>
             </div>
-            <div className="card-list">
-              <div className="custom-card">
-                <h3>Payment History</h3>
-                <p>Check all your previous payments</p>
-                <button onClick={() => navigate("/payments")} className="payment-btn">
-                  View History
-                </button>
-              </div>
-            </div>
+            <table className="table" width="100%" border="1">
+                  <thead>
+                    <tr>
+                      <th>PAYMENT ID</th>
+                      <th>PSYCHOLOGIST NAME</th>
+                      <th>APPOIMENT ID</th>
+                      <th>PAYMENT METHOD</th>
+                      <th>AMOUNT</th>
+                      <th>DATE</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  {payments.length > 0 ? (
+                    payments.map((item) => (
+                      
+                      <tr key={item.PAYMENT_ID}>
+                        <th>{item.PAYMENT_ID}</th>
+
+                        <th>{item.PSYCHOLOGIST_FIRST_NAME}</th>
+                        <th>{item.APPOINTMENT_ID}</th>
+                        <th>{item.PAYMENT_METHOD}</th>
+                        <th>{item.PAYMENT_AMOUNT}</th>
+                        <th>{item.PAYMENT_DATE}</th>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <th colSpan="6">No data available</th>
+                    </tr>
+                  )}
+                  </tbody>
+                </table>
           </section>
         )}
 
