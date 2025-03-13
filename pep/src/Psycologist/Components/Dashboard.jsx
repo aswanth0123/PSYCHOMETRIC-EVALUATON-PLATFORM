@@ -16,6 +16,7 @@ const P_Dashboard = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
   const [result,setResult] = useState([])
   const [appoiments,setAppoiments] = useState([])
+  const [testsData, setTestsData] = useState([]);
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -23,16 +24,16 @@ const P_Dashboard = () => {
       .get("http://localhost:5000/api/test-evaluations/")
       .then((response) => (setResult(response.data)))
       .catch((error) => console.log("Error fetching test evaluations:", error));
+
+      axios.get('http://localhost:5000/api/tests/').then((response) => {
+        setTestsData(response.data);
+    })
   },[]); 
   useEffect(() => {
     axios
       .get("http://localhost:5000/api/appointments/")
       .then((response) =>{
-        if (Array.isArray(response.data)) {
-          const filteredData = response.data.filter(
-            (item) => item.PSYCHOLOGIST_ID === JSON.parse(sessionStorage.getItem("psychologist")).id
-          );
-      } setAppoiments(filteredData)})
+       setAppoiments(response.data)})
       .catch((error) => console.log("Error fetching test evaluations:", error));
   },[]); 
   console.log(result);
@@ -88,7 +89,7 @@ const P_Dashboard = () => {
               <p>Explore and take tests to understand yourself better.</p>
             </div>
             <div className="card-list">
-              {tests.map((test) => (
+              {testsData.map((test) => (
                 <TestCard key={test.id} test={test} />
               ))}
             </div>
@@ -153,11 +154,11 @@ const P_Dashboard = () => {
                     appoiments.map((item) => (
                       
                       <tr key={item.APPOINTMENT_ID}>
-                        <th>{item.TEST_ID}</th>
+                        <th>{item.APPOINTMENT_ID}</th>
 
-                        <th>{item.candidate_name}</th>
-                        <th>{item.test_name}</th>
-                        <th>{item.test_result}</th>
+                        <th>{item.candidate_first_name}</th>
+                        <th>{item.TEST_NAME}</th>
+                        <th>{item.TEST_EVALUATION}</th>
                         <th>{item.TIME_SLOT}</th>
                       </tr>
                     ))

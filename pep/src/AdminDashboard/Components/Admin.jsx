@@ -51,6 +51,11 @@ const AdminDashboard = () => {
     fetchData();
   }
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
+  }
+
   return (
     <div>
       <header>
@@ -202,6 +207,8 @@ const AdminDashboard = () => {
         <div className="section" id="settings">
           <h2>Settings</h2>
           <p>Update your account settings, manage notifications, and customize the dashboard.</p>
+          <button onClick={handleLogout} className="btn1">Logout</button>
+          
         </div>
       </div>
     </div>

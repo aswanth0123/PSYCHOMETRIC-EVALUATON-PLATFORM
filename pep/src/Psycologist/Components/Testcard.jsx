@@ -31,7 +31,7 @@ const TestCard = ({ test }) => {
 
   return (
     <div className="test-card">
-      <h3>{test.name}</h3>
+      <h3>{test.TEST_NAME}</h3>
       {/* <button onClick={startTest} className="test-btn">Start Test</button> */}
     </div>
   );
