@@ -27,7 +27,7 @@ router.get("/", (req, res) => {
         `SELECT te.TEST_EVALUATION_ID,c.ID, c.first_name, c.last_name, t.TEST_NAME, te.TEST_EVALUATION
          FROM test_evaluation te
          JOIN candidates c ON te.CANDIDATE_ID = c.ID
-         JOIN test_details t ON te.TEST_ID = t.TEST_ID`,
+         JOIN test_details t ON te.TEST_ID = t.TEST_ID ORDER BY te.TEST_EVALUATION_ID DESC`,
         (err, results) => {
             if (err) {
                 return res.status(500).json({ error: err.message });
