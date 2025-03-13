@@ -2,16 +2,16 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Quiz.css';
-import { data } from '../../assets/(EI)test';
 
 const Quiz = () => {
+  let [data, setData] = useState([]);
   let [index, setIndex] = useState(0);
-  let [question, setQuestion] = useState(data[index]);
+  let [question, setQuestion] = useState(null);
   let [lock, setLock] = useState(false);
   let [score, setScore] = useState(0);
   let [result, setResult] = useState(false);
   let [start, setStart] = useState(false); // Start screen state
-
+  let [test,setTest] = useState({})
   let Option1 = useRef(null);
   let Option2 = useRef(null);
   let Option3 = useRef(null);
@@ -19,13 +19,32 @@ const Quiz = () => {
   let option_array = [Option1, Option2, Option3, Option4];
 
   const navigate = useNavigate(); // Initialize navigate
+  const testid = window.location.search.split("=")[1];
+
+  useEffect(() => {
+    axios.get("http://localhost:5000/api/tests").then((response) =>{
+      const filter = response.data.filter((t)=>t.TEST_ID==testid)
+      setTest(filter[0])
+
+    })
+    axios.get("http://localhost:5000/api/questions").then((response) => {
+      const filter=response.data.filter((item) => item.test_id == testid);
+      setData([...filter]);
+      setQuestion(filter[index])
+    })
+
+  }, []);
+  
+  
 
   // Function to check answer
   const checkAns = (e, ans) => {
     if (!lock) {
-      if (question.ans === ans) {
+      if (question.correct_option == ans) {
         e.target.classList.add('correct');
         setScore((prev) => prev + 1);
+        
+
       } else {
         e.target.classList.add('wrong');
       }
@@ -81,22 +100,24 @@ const Quiz = () => {
 
   // Function to calculate performance
   const getPerformanceMessage = (score) => {
-    if (score >= 0 && score <= 5) return "Poor";
-    if (score >= 6 && score <= 10) return "Below Average";
-    if (score >= 11 && score <= 15) return "Average";
-    if (score >= 16 && score <= 20) return "Good";
-    return "Invalid Score";
+    console.log(score);
+    
+    if (score >= data.length*0.75) return "Good";
+    else if (score >= data.length*0.50) return "Average";
+    else if (score >= data.length*0.25) return "Below Average";
+    else return "Poor";
   };
 
   const book = () => {
     navigate('/appointment');
   };
-
+  console.log('task' ,test);
+  
   return (
     <div className='container'>
       {!start ? (
         <div className="instructions">
-          <h1>Welcome to the Emotional Intelligence Test</h1>
+          <h1>Welcome to the {test.TEST_NAME} </h1>
           <p>Please read the following instructions carefully before starting the test:</p>
           <ol>
             <li><b>General Instruction:</b> Sit in a peaceful environment before beginning the test.</li>
@@ -111,15 +132,15 @@ const Quiz = () => {
         </div>
       ) : !result ? (
         <>
-          <h1>Emotional Intelligence Test</h1>
+          <h1>{test.TEST_NAME}</h1>
           <hr />
-          <h1>{index + 1}. {question.question}</h1>
+          <h1>{index + 1}. {question.question_text}</h1>
           <ul>
             <b>
-              <li ref={Option1} onClick={(e) => { checkAns(e, 1); }}>{question.option1}</li>
-              <li ref={Option2} onClick={(e) => { checkAns(e, 2); }}>{question.option2}</li>
-              <li ref={Option3} onClick={(e) => { checkAns(e, 3); }}>{question.option3}</li>
-              <li ref={Option4} onClick={(e) => { checkAns(e, 4); }}>{question.option4}</li>
+              <li ref={Option1} onClick={(e) => { checkAns(e, question.option_a); }}>{question.option_a}</li>
+              <li ref={Option2} onClick={(e) => { checkAns(e, question.option_b); }}>{question.option_b}</li>
+              <li ref={Option3} onClick={(e) => { checkAns(e, question.option_c); }}>{question.option_c}</li>
+              <li ref={Option4} onClick={(e) => { checkAns(e, question.option_d); }}>{question.option_d}</li>
             </b>
           </ul>
           <button onClick={next}>

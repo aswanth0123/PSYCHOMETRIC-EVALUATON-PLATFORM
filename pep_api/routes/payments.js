@@ -1,6 +1,9 @@
 const express = require("express");
 const db = require("../db"); // Database connection
 const router = express.Router();
+const Razorpay = require("razorpay");
+require("dotenv").config();
+const crypto = require("crypto");
 
 // ✅ Create Payments Table if not exists
 const createTableQuery = `
@@ -32,18 +35,62 @@ router.get("/", (req, res) => {
 
 
 
-// ✅ POST API - Add a New Payment
-router.post("/", (req, res) => {
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID, // Your Razorpay Key ID
+  key_secret: process.env.RAZORPAY_KEY_SECRET, // Your Razorpay Secret Key
+});
+
+// ✅ **Create Razorpay Order**
+router.post("/create-order", async (req, res) => {
   const { CANDIDATE_ID, PSYCHOLOGIST_ID, APPOINTMENT_ID, PAYMENT_METHOD, PAYMENT_AMOUNT } = req.body;
 
   if (!CANDIDATE_ID || !PSYCHOLOGIST_ID || !APPOINTMENT_ID || !PAYMENT_METHOD || !PAYMENT_AMOUNT) {
-    return res.status(400).json({ error: "All fields are required" });
+      return res.status(400).json({ error: "All fields are required" });
   }
 
-  const sql = "INSERT INTO payments (CANDIDATE_ID, PSYCHOLOGIST_ID, APPOINTMENT_ID, PAYMENT_METHOD, PAYMENT_AMOUNT) VALUES (?, ?, ?, ?, ?)";
-  db.query(sql, [CANDIDATE_ID, PSYCHOLOGIST_ID, APPOINTMENT_ID, PAYMENT_METHOD, PAYMENT_AMOUNT], (err, result) => {
-    if (err) return res.status(500).json({ error: "Internal Server Error" });
-    res.status(201).json({ message: "Payment added successfully", payment_id: result.insertId });
+  try {
+      const options = {
+          amount: PAYMENT_AMOUNT * 100, // Convert amount to paise (1 INR = 100 paise)
+          currency: "INR",
+          receipt: `order_${Date.now()}`,
+      };
+
+      const order = await razorpay.orders.create(options);
+
+      res.json({
+          orderId: order.id,
+          amount: order.amount,
+          currency: order.currency,
+          CANDIDATE_ID,
+          PSYCHOLOGIST_ID,
+          APPOINTMENT_ID,
+          PAYMENT_METHOD
+      });
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
+});
+
+// ✅ **Verify Payment and Store in Database**
+router.post("/verify-payment", (req, res) => {
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature, CANDIDATE_ID, PSYCHOLOGIST_ID, APPOINTMENT_ID, PAYMENT_METHOD, PAYMENT_AMOUNT } = req.body;
+
+  const generatedSignature = crypto
+      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+      .update(razorpay_order_id + "|" + razorpay_payment_id)
+      .digest("hex");
+
+  if (generatedSignature !== razorpay_signature) {
+      return res.status(400).json({ success: false, message: "Payment verification failed" });
+  }
+
+  // ✅ **Insert Payment Record in Database**
+  const sql = `INSERT INTO payments (CANDIDATE_ID, PSYCHOLOGIST_ID, APPOINTMENT_ID, PAYMENT_METHOD, PAYMENT_AMOUNT, RAZORPAY_PAYMENT_ID) VALUES (?, ?, ?, ?, ?, ?)`;
+
+  db.query(sql, [CANDIDATE_ID, PSYCHOLOGIST_ID, APPOINTMENT_ID, PAYMENT_METHOD, PAYMENT_AMOUNT, razorpay_payment_id], (err, result) => {
+      if (err) return res.status(500).json({ error: "Database Error" });
+
+      res.status(201).json({ success: true, message: "Payment verified and stored successfully", payment_id: result.insertId });
   });
 });
 

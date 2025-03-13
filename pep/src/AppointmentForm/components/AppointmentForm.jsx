@@ -77,6 +77,7 @@ const AppointmentForm = () => {
         {
           headers: { "Content-Type": "application/json" }
         }
+
       );
     
       console.log("✅ Appointment Created:", response.data);
@@ -85,6 +86,7 @@ const AppointmentForm = () => {
         `Appointment successfully booked for Candidate ID ${appointmentData.CANDIDATE_ID} 
         with Dr. Psychologist on ${appointmentData.TIME_SLOT}.`
       );
+      setTimeout(()=>{},[])
     
     } catch (error) {
       console.error("❌ Error creating appointment:", error.response?.data || error.message);

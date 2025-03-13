@@ -66,7 +66,7 @@ const AddQuestion = () => {
   };
 
   return (
-    <div className="container">
+    <div className="container2">
       {/* Left Section - Question Form */}
       <div className="form-container">
         <h2>Add Question</h2>

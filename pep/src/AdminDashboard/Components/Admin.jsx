@@ -46,6 +46,11 @@ const AdminDashboard = () => {
     fetchData();
   }
 
+  const deleteTest = (testid) => {
+    axios.delete(`http://localhost:5000/api/tests/${testid}`)
+    fetchData();
+  }
+
   return (
     <div>
       <header>
@@ -82,7 +87,7 @@ const AdminDashboard = () => {
                 <td>{test.TEST_DESCRIPTION}</td>
                 <td id="tdbtn">
                   <button className="btn1" onClick={() => questionload(test.TEST_ID)}>Manage</button>
-                  <button className="btn1" >Delete</button>
+                  <button className="btn1" onClick={() => deleteTest(test.TEST_ID)} >Delete</button>
                 </td>
               </tr>
 

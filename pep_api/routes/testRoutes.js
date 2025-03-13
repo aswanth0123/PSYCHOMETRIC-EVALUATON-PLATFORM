@@ -70,16 +70,37 @@ router.put("/:id", (req, res) => {
 router.delete("/:id", (req, res) => {
     const { id } = req.params;
 
-    const deleteQuery = "DELETE FROM test_details WHERE TEST_ID = ?";
-    db.query(deleteQuery, [id], (err, result) => {
-        if (err) {
-            return res.status(500).json({ error: "Database error" });
-        }
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: "Test not found" });
-        }
-        res.json({ message: "Test deleted successfully" });
-    });
+    const deleteQueries = [
+        "DELETE FROM test_evaluation WHERE TEST_ID = ?",
+        "DELETE FROM questions WHERE test_id = ?",
+        "DELETE FROM appointments_table WHERE TEST_ID = ?",
+        "DELETE FROM test_details WHERE TEST_ID = ?"
+    ];
+
+    let completedQueries = 0;
+
+    const executeQuery = (query) => {
+        return new Promise((resolve, reject) => {
+            db.query(query, [id], (err, result) => {
+                if (err) return reject({ status: 500, message: "Database error" });
+                resolve(result);
+            });
+        });
+    };
+
+    Promise.all(deleteQueries.map(executeQuery))
+        .then((results) => {
+            // Check if all queries affected rows; if not, return 404
+            const allAffected = results.some(result => result.affectedRows > 0);
+            if (!allAffected) {
+                return res.status(404).json({ error: "Test not found" });
+            }
+            res.json({ message: "Test deleted successfully" });
+        })
+        .catch((error) => {
+            res.status(error.status || 500).json({ error: error.message });
+        });
 });
+
 
 module.exports = router;

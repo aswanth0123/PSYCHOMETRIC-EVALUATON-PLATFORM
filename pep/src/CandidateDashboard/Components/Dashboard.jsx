@@ -17,6 +17,7 @@ const Dashboard = () => {
   const [result,setResult] = useState([])
   const [appoiments,setAppoiments] = useState([])
   const navigate = useNavigate();
+  const [testsData, setTestsData] = useState([]);
   const loggedInUser = JSON.parse(sessionStorage.getItem("user"));
   console.log(loggedInUser);
   
@@ -52,19 +53,14 @@ const Dashboard = () => {
       })
       .catch((error) => console.log("Error fetching test evaluations:", error));
 
+      axios.get('http://localhost:5000/api/tests/').then((response) => {
+          setTestsData(response.data);
+      })
+
   }, [candidateId]); 
 
   console.log(result);
 
-  
-  const tests = [
-    { id: 1, name: "Emotional Intelligence Test" },
-    { id: 2, name: "Verbal Reasoning Test" },
-    { id: 3, name: "Numerical Reasoning Test" },
-    { id: 4, name: "Logical Reasoning Test" },
-    { id: 5, name: "Situational Judgement Test" },
-    { id: 6, name: "Decision Making Test" },
-  ];
 
   return (
     <div className="dashboard-container">
@@ -109,7 +105,7 @@ const Dashboard = () => {
               <p>Explore and take tests to understand yourself better.</p>
             </div>
             <div className="card-list">
-              {tests.map((test) => (
+              {testsData.map((test) => (
                 <TestCard key={test.id} test={test} />
               ))}
             </div>
