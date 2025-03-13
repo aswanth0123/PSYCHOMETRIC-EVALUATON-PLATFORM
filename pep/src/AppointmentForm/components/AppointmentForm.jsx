@@ -81,13 +81,15 @@ const AppointmentForm = () => {
       );
     
       console.log("✅ Appointment Created:", response.data);
-    
+      
       setConfirmationMessage(
         `Appointment successfully booked for Candidate ID ${appointmentData.CANDIDATE_ID} 
         with Dr. Psychologist on ${appointmentData.TIME_SLOT}.`
       );
-      setTimeout(()=>{},[])
-    
+      sessionStorage.setItem("appointment", JSON.stringify(response.data.APPOINTMENT_ID));
+      setTimeout(() => {
+        navigate("/payment");
+      })
     } catch (error) {
       console.error("❌ Error creating appointment:", error.response?.data || error.message);
       alert("Failed to create appointment. Please try again.");

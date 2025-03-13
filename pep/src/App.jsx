@@ -16,6 +16,7 @@ import P_Dashboard from './Psycologist/Components/Dashboard';
 import AdminLogin from './AdminLogin';
 import AdminDashboard from './AdminDashboard/Components/Admin';
 import AddQuestion from './AdminDashboard/Components/AddQuestion';
+import Checkout from './AppointmentForm/components/Payments';
 function App() {
   return (
     <Router>
@@ -37,6 +38,7 @@ function App() {
           <Route path="/admin" element={<AdminLogin/>}/>
           <Route path='/AdminDashboard' element={<AdminDashboard/>}/>
           <Route path="/addquestion" element={<AddQuestion />} />
+          <Route path="/payment" element={<Checkout />} />
 
         </Routes>
       </div>
