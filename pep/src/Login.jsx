@@ -22,8 +22,8 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem("token", data.token); // Store token for authentication
-        sessionStorage.setItem("psychologist", JSON.stringify(data.user));
+        localStorage.setItem("token", data.token); // Store token for authentication   
+        sessionStorage.setItem("psychologist", JSON.stringify(data.psychologist));
         alert("Login Successful!");
         navigate("/psychologist"); // Redirect to Dashboard
       } else {

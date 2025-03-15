@@ -67,4 +67,24 @@ router.post("/login", (req, res) => {
     });
 });
 
+
+router.get("/:id", (req, res) => {
+    const { id } = req.params;
+    db.query("SELECT * FROM candidates WHERE id = ?", [id], (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      if (result.length === 0) return res.status(404).json({ error: "User not found" });
+      res.json(result[0]);
+    });
+  });
+
+  router.put("/:id", (req, res) => {
+    const { id } = req.params;
+    const { first_name, last_name, email, contact_number,password } = req.body;
+  
+    const sql = "UPDATE candidates SET first_name = ?, last_name = ?, email = ?, contact_number = ? , password = ? WHERE id = ?";
+    db.query(sql, [first_name, last_name, email, contact_number,password , id], (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ success: true, message: "Profile updated successfully" });
+    });
+  });
 module.exports = router;

@@ -1,8 +1,32 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './LandingPage.css';
 import illustration from './assets/illustration.png'
+import axios from 'axios';
 const LandingPage = () => {
+    const [tests, setTests] = useState([]);
+    const [feedback,setFeedback] = useState([]);
+    useEffect(() => {
+        axios.get('http://localhost:5000/api/tests')
+        .then(response => {
+            setTests(response.data);
+        })
+        .catch(error => {
+            console.error('Error fetching tests:', error);
+        });
+
+        axios.get('http://localhost:5000/api/feedback')
+        .then(response => {
+            const latestFeedback = response.data.slice(-4); // Get the last 4 items
+            setFeedback(latestFeedback.reverse());
+        })
+        .catch(error => {
+            logger.error('Error fetching feedback:', error);
+        })
+        
+    },[])
+    // console.log(feedback);
+    
     return (
         <div className="landing-page">
             {/* Header Section */}
@@ -64,30 +88,17 @@ const LandingPage = () => {
             <section id="tests" className="tests">
                 <h2>Available Tests</h2>
                 <div className="tests-grid">
-                    <div className="test-item">
+                    {tests.map((test) => (
+                        <div key={test.id} className="test-item">
+                            <h3>{test.TEST_NAME}</h3>
+                            <p>{test.TEST_DESCRIPTION}</p>
+                        </div>
+                    ))}
+                    {/* <div className="test-item">
                         <h3>Emotional Intelligence</h3>
                         <p>Assess your ability to understand and manage emotions.</p>
-                    </div>
-                    <div className="test-item">
-                        <h3>Verbal Ability Test</h3>
-                        <p>Evaluate your verbal reasoning and communication skills.</p>
-                    </div>
-                    <div className="test-item">
-                        <h3>Numerical Reasoning Test</h3>
-                        <p>Measure your ability to work with numbers and analyze data.</p>
-                    </div>
-                    <div className="test-item">
-                        <h3>Logical Reasoning Test</h3>
-                        <p>Test your logical reasoning capabilities.</p>
-                    </div>
-                    <div className="test-item">
-                        <h3>Situational Judgement Test</h3>
-                        <p>Evaluate how you handle real-life situations and make decisions.</p>
-                    </div>
-                    <div className="test-item">
-                        <h3>Decision Making Test</h3>
-                        <p>Assess your ability to make effective and informed decisions.</p>
-                    </div>
+                    </div> */}
+
                 </div>
             </section>
 
@@ -125,15 +136,15 @@ const LandingPage = () => {
                 <p>Here are some of the valuable feedback from our users:</p>
 
                 <div className="feedback-list">
-                    <div className="feedback-item">
-                        <p><strong>Candidate 1</strong> - "The psychometric tests helped me better understand my strengths and career path. Highly recommended!"</p>
+                    {feedback.length == 0 && <p>No feedback available.</p>}
+                    {feedback.map((feed)=>(
+                    <div key={feed.FEEDBACK_ID} className="feedback-item">
+                        <p><strong>{feed.CANDIDATE_NAME} </strong> - "{feed.FEEDBACK}"</p>
                     </div>
-                    <div className="feedback-item">
-                        <p><strong>Candidate 2</strong> - "I had a fantastic experience with the consultation. The insights I received were incredibly valuable!"</p>
-                    </div>
-                    <div className="feedback-item">
-                        <p><strong>Candidate 3</strong> - "Booking an appointment was simple, and the psychologist provided clear, actionable advice. Great platform!"</p>
-                    </div>
+                    ))}
+
+
+
                 </div>
             </section>
 

@@ -15,7 +15,7 @@ const adminRoutes = require("./routes/adminRoutes");
 app.use("/api/admin", adminRoutes);
 
 const psychologistRoutes = require("./routes/psychologistAuth");
-app.use("/api", psychologistRoutes);
+app.use("/api/psychologist", psychologistRoutes);
 
 const testRoutes = require("./routes/testRoutes");
 app.use("/api/tests", testRoutes);
@@ -31,6 +31,9 @@ app.use("/api/payments", paymentsRoutes);
 
 const questionsRoutes = require("./routes/questions");
 app.use("/api/questions", questionsRoutes);
+
+const feedbackRoutes = require("./routes/feedback");
+app.use("/api/feedback", feedbackRoutes);
 
 
 

@@ -20,60 +20,113 @@ const Dashboard = () => {
   const [testsData, setTestsData] = useState([]);
   const loggedInUser = JSON.parse(sessionStorage.getItem("user"));
   const [payments, setPayments] = useState([]);
-  console.log(loggedInUser);
+  const [nextAppointmentDate, setNextAppointmentDate] = useState('');
+  const [feedback, setFeedback] = useState([]); 
   
   const candidateId = loggedInUser.id;
+  const [user, setUser] = useState({
+    first_name: "",
+    last_name : "",
+    email: "",
+    contact_number: "",
+    gender: "",
+    password: ""
+  });
+  const [message, setMessage] = useState("");
 
-  useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/test-evaluations/")
-      .then((response) => {
-        if (Array.isArray(response.data)) {
-          // console.log(response.data);
-
-          // Filter only the logged-in candidate's test evaluations
-          const filteredData = response.data.filter(
-            (item) => item.ID === candidateId
-          );
-          setResult(filteredData);
-        }
-      })
-      .catch((error) => console.log("Error fetching test evaluations:", error));
-
+  const fetchData = async () => {
+    console.log('data getting');
+    
+    try {
+      const [evaluationsRes, appointmentsRes, testsRes, paymentsRes, feedbackRes] = await Promise.all([
+        axios.get("http://localhost:5000/api/test-evaluations/"),
+        axios.get("http://localhost:5000/api/appointments/"),
+        axios.get("http://localhost:5000/api/tests/"),
+        axios.get("http://localhost:5000/api/payments/"),
+        axios.get("http://localhost:5000/api/feedback/")
+      ]);
+  
+      if (Array.isArray(evaluationsRes.data)) {
+        setResult(evaluationsRes.data.filter(item => item.ID === candidateId));
+      }
+  
+      if (Array.isArray(appointmentsRes.data)) {
+        const filteredAppointments = appointmentsRes.data.filter(item => item.candidate_id === candidateId);
+        setAppoiments(filteredAppointments);
+  
+        const upcomingAppointments = filteredAppointments.filter(app => new Date(app.TIME_SLOT) >= new Date());
+        setNextAppointmentDate(
+          upcomingAppointments.length ? new Date(upcomingAppointments[0].TIME_SLOT).toLocaleDateString() : 'No scheduled appointments'
+        );
+      }
+  
+      setTestsData(testsRes.data);
+  
+      if (Array.isArray(paymentsRes.data)) {
+        setPayments(paymentsRes.data.filter(item => item.CANDIDATE_ID === candidateId));
+      }
+  
+      setFeedback(feedbackRes.data);
+  
       axios
-      .get("http://localhost:5000/api/appointments/")
+      .get(`http://localhost:5000/api/auth/${candidateId}`)
       .then((response) => {
-        if (Array.isArray(response.data)) {
-          
-          // Filter only the logged-in candidate's test evaluations
-          const filteredData = response.data.filter(
-            (item) => item.candidate_id === candidateId
-          );
-          setAppoiments(filteredData);
-        }
+        setUser(response.data);
       })
-      .catch((error) => console.log("Error fetching test evaluations:", error));
+      .catch((error) => console.error("Error fetching user data:", error));
 
-      axios.get('http://localhost:5000/api/tests/').then((response) => {
-          setTestsData(response.data);
+
+
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+  
+  // ✅ Fetch data when component mounts & when candidateId changes
+  useEffect(() => {
+    fetchData();
+  }, [candidateId]);
+  
+  const handleAdd = async () => {
+    let a = prompt("Enter Your feedback");
+    if (!a) return; // Prevent empty feedback
+  
+    try {
+      await axios.post("http://localhost:5000/api/feedback/", {
+        candidate_id: candidateId,
+        feedback: a
+      });
+  
+      console.log("Feedback submitted successfully");
+  
+      // ✅ Fetch updated feedback list immediately
+      fetchData();
+  
+    } catch (error) {
+      console.error("Error submitting feedback:", error.message);
+    }
+  };
+
+  const handleChange = (e) => {
+    setUser({ ...user, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    axios
+      .put(`http://localhost:5000/api/auth/${candidateId}`, user)
+      .then((response) => {
+        setMessage("Profile updated successfully!");
       })
+      .catch((error) => {
+        setMessage("Error updating profile.");
+        console.error("Update error:", error);
+      });
+  };
 
-      axios.get('http://localhost:5000/api/payments/').then((response) => {
-        if (Array.isArray(response.data)) {
-          // console.log(response.data);
-
-          // Filter only the logged-in candidate's test evaluations
-          const filteredData = response.data.filter(
-            (item) => item.CANDIDATE_ID === candidateId
-          );
-          setPayments(filteredData);
-        }
-        
-      })
-
-  }, [candidateId]); 
-
-  console.log(result);
+  // console.log(loggedInUser);
+  
 
 
   return (
@@ -94,18 +147,18 @@ const Dashboard = () => {
             <div className="dashboard-overview">
               <div className="overview-card">
                 <FaClipboardList className="overview-icon" />
-                <h3>6 Tests Available</h3>
+                <h3>{testsData.length} Tests Available</h3>
                 <p>Start exploring now</p>
               </div>
               <div className="overview-card">
                 <FaCheckCircle className="overview-icon" />
-                <h3>Tests Completed</h3>
+                <h3>{result.length} Tests Completed</h3>
                 <p>Select tests to see</p>
               </div>
               <div className="overview-card">
                 <FaCalendarAlt className="overview-icon" />
                 <h3>Next Appointment</h3>
-                <p>No scheduled appointments</p>
+                <p>{nextAppointmentDate}</p>
               </div>
             </div>
           </div>
@@ -245,7 +298,7 @@ const Dashboard = () => {
                     </tr>
                   )}
                   </tbody>
-                </table>
+            </table>
           </section>
         )}
 
@@ -258,14 +311,113 @@ const Dashboard = () => {
               </h1>
               <p>We value your thoughts! Please share your feedback.</p>
             </div>
-            <div className="card-list">
-              <div className="custom-card">
-                <h3>Share your feedback</h3>
-                <p>Let us know how we can improve your experience.</p>
-                <button onClick={() => navigate("/feedback")} className="feedback-btn">
-                  Give Feedback
-                </button>
-              </div>
+            <div>
+              Add Feedback <button className="test-btn" onClick={handleAdd}>Click here</button>
+            </div>
+            <table className="table" width="100%" border="1">
+                  <thead>
+                    <tr>
+                      <th>Feedback ID</th>
+                      <th>Candidate NAME</th>
+                      <th>Feedback</th>
+             
+                    </tr>
+                  </thead>
+                  <tbody>
+                  {feedback.length > 0 ? (
+                    feedback.map((item) => (
+                      
+                      <tr key={item.FEEDBACK_ID}>
+                        <th>{item.FEEDBACK_ID}</th>
+
+                        <th>{item.CANDIDATE_NAME}</th>
+                        <th>{item.FEEDBACK}</th>
+
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <th colSpan="3">No data available</th>
+                    </tr>
+                  )}
+                  </tbody>
+            </table>
+          </section>
+        )}
+
+        {/* ========== Settings Section ========== */}
+        {activeSection === "settings" && (
+          <section className="feedback-section">
+            <div className="banner feedback-banner">
+              <h1>
+              Settings
+              </h1>
+              <p>You can Update your Profile</p>
+            </div>
+            <div>
+            {message && <p className="text-green-600 mb-4">{message}</p>}
+
+<form onSubmit={handleSubmit}>
+  <div className="mb-4">
+    <label className="block font-medium">First Name:</label>
+    <input
+      type="text"
+      name="first_name"
+      value={user.first_name}
+      onChange={handleChange}
+      className="w-full p-2 border rounded"
+    />
+  </div>
+  <div className="mb-4">
+    <label className="block font-medium">Last Name:</label>
+    <input
+      type="text"
+      name="last_name"
+      value={user.last_name}
+      onChange={handleChange}
+      className="w-full p-2 border rounded"
+    />
+  </div>
+  <div className="mb-4">
+    <label className="block font-medium">Email:</label>
+    <input
+      type="email"
+      name="email"
+      value={user.email}
+      onChange={handleChange}
+      className="w-full p-2 border rounded"
+    />
+  </div>
+
+  <div className="mb-4">
+    <label className="block font-medium">Phone:</label>
+    <input
+      type="text"
+      name="contact_number"
+      value={user.contact_number}
+      onChange={handleChange}
+      className="w-full p-2 border rounded"
+    />
+  </div>
+
+  <div className="mb-4">
+    <label className="block font-medium">Password:</label>
+    <input
+      type="text"
+      name="password"
+      value=""
+      placeholder="if You want to update password Enter new Password here"
+      onChange={handleChange}
+      className="w-full p-2 border rounded"
+    />
+  </div>
+
+
+
+  <button type="submit" className="bg-blue-500 text-white p-2 rounded">
+    Update Profile
+  </button>
+</form>
             </div>
           </section>
         )}

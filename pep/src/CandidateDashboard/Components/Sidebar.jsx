@@ -14,7 +14,7 @@ const Sidebar = ({ setActiveSection }) => {
 
   return (
     <div className="sidebar">
-      <h2 className="logo">Psychometric Evaluation Platform</h2>
+      <h2 className="logo">PHYCOLINC</h2>
       <ul>
         <li onClick={() => setActiveSection("dashboard")}>
           <FaHome className="sidebar-icon" />
@@ -42,7 +42,9 @@ const Sidebar = ({ setActiveSection }) => {
           <FaCommentDots className="sidebar-icon" />
           <span>Feedback</span>
         </li>
-
+        <li onClick={() => setActiveSection("settings")}>
+          <span>Settings</span>
+        </li>
       </ul>
       
       
