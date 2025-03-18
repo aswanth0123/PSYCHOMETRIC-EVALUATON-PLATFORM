@@ -6,6 +6,7 @@ const db = require("../db");
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET;
 
+// Create candidates table if not exists
 const createTableQuery = `
 CREATE TABLE IF NOT EXISTS candidates (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -15,9 +16,8 @@ CREATE TABLE IF NOT EXISTS candidates (
     gender ENUM('Male', 'Female') NOT NULL,
     contact_number VARCHAR(10) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL  -- Hashed password storage
+    password VARCHAR(255) NOT NULL  
 );
-
 `;
 
 db.query(createTableQuery, (err) => {
@@ -25,16 +25,9 @@ db.query(createTableQuery, (err) => {
     else console.log("✅ Candidates table is ready.");
 });
 
-
-
-
-
-
-
 // User Registration
 router.post("/register", async (req, res) => {
     const { firstName, lastName, dob, gender, contactNumber, email, password } = req.body;
-    
     const hashedPassword = await bcrypt.hash(password, 10);
 
     db.query(
@@ -42,12 +35,12 @@ router.post("/register", async (req, res) => {
         [firstName, lastName, dob, gender, contactNumber, email, hashedPassword],
         (err, result) => {
             if (err) {
-                console.error("Database Error:", err); // Log the error
-                return res.status(500).json({ error: err.message }); // Send error message
+                console.error("Database Error:", err);
+                return res.status(500).json({ error: err.message });
             }
             res.status(201).json({ message: "User registered successfully" });
         }
-    );    
+    );
 });
 
 // User Login
@@ -67,24 +60,49 @@ router.post("/login", (req, res) => {
     });
 });
 
+// Verify Email (Forget Password Step 1)
+router.post("/verify-email", (req, res) => {
+    const { email } = req.body;
+    
+    db.query("SELECT * FROM candidates WHERE email = ?", [email], (err, result) => {
+        if (err) return res.status(500).json({ error: "Database error" });
+        if (result.length === 0) return res.status(404).json({ error: "Email not found" });
+        
+        res.json({ message: "Email verified. Proceed to reset password." });
+    });
+});
 
+// Reset Password (Forget Password Step 2)
+router.post("/reset-password", async (req, res) => {
+    const { email, newPassword } = req.body;
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    db.query("UPDATE candidates SET password = ? WHERE email = ?", [hashedPassword, email], (err, result) => {
+        if (err) return res.status(500).json({ error: "Database error" });
+        res.json({ message: "Password reset successfully." });
+    });
+});
+
+// Get User by ID
 router.get("/:id", (req, res) => {
     const { id } = req.params;
     db.query("SELECT * FROM candidates WHERE id = ?", [id], (err, result) => {
-      if (err) return res.status(500).json({ error: err.message });
-      if (result.length === 0) return res.status(404).json({ error: "User not found" });
-      res.json(result[0]);
+        if (err) return res.status(500).json({ error: err.message });
+        if (result.length === 0) return res.status(404).json({ error: "User not found" });
+        res.json(result[0]);
     });
-  });
+});
 
-  router.put("/:id", (req, res) => {
+// Update User Profile
+router.put("/:id", (req, res) => {
     const { id } = req.params;
-    const { first_name, last_name, email, contact_number,password } = req.body;
-  
-    const sql = "UPDATE candidates SET first_name = ?, last_name = ?, email = ?, contact_number = ? , password = ? WHERE id = ?";
-    db.query(sql, [first_name, last_name, email, contact_number,password , id], (err, result) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json({ success: true, message: "Profile updated successfully" });
+    const { first_name, last_name, email, contact_number, password } = req.body;
+    const sql = "UPDATE candidates SET first_name = ?, last_name = ?, email = ?, contact_number = ?, password = ? WHERE id = ?";
+    
+    db.query(sql, [first_name, last_name, email, contact_number, password, id], (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ success: true, message: "Profile updated successfully" });
     });
-  });
+});
+
 module.exports = router;

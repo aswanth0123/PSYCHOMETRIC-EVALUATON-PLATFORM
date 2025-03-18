@@ -146,6 +146,10 @@ export default function AuthForm() {
                     <input type="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange} />
                     {errors.password && <p className="error">{errors.password}</p>}
 
+                    {isLogin && (
+                    <a href="forgetpassword" style={{ textDecoration: "none",marginBottom:"50px" }}>Forget Password</a>
+                    )
+                    }
                     <button type="submit" disabled={loading}>{loading ? "Processing..." : isLogin ? "Login" : "SignUp"}</button>
                 </form>
 

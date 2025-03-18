@@ -46,7 +46,7 @@ router.post("/", (req, res) => {
 });
 
 // ✅ **3. Update a test by ID (PUT)**
-router.put("/:id", (req, res) => {
+router.put("/update-task/:id", (req, res) => {
     const { id } = req.params;
     const { TEST_NAME, TEST_DESCRIPTION } = req.body;
 

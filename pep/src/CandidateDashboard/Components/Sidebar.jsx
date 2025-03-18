@@ -43,7 +43,7 @@ const Sidebar = ({ setActiveSection }) => {
           <span>Feedback</span>
         </li>
         <li onClick={() => setActiveSection("settings")}>
-          <span>Settings</span>
+          <span>Profile</span>
         </li>
       </ul>
       

@@ -74,4 +74,45 @@ router.get("/", (req, res) => {
     });
 });
 
+
+
+router.get("/booked", (req, res) => {
+    const { date } = req.query;
+
+    if (!date) {
+        return res.status(400).json({ error: "Date parameter is required." });
+    }
+
+    // ✅ Fix: Ensure `TIME_SLOT` is properly formatted
+    const sql = `SELECT TIME_SLOT FROM appointments_table WHERE DATE(TIME_SLOT) = ?`;
+
+    db.query(sql, [date], (err, results) => {
+        if (err) {
+            console.error("❌ Error fetching booked slots:", err);
+            return res.status(500).json({ error: "Database error while fetching booked slots." });
+        }
+
+        if (!results || results.length === 0) {
+            return res.json({ bookedSlots: [] }); // ✅ Handle empty results
+        }
+
+        console.log("📅 Fetched booked slots:", results);
+
+        // ✅ Fix: Ensure correct 12-hour format for all time slots
+        const bookedTimes = results.map(appointment => {
+            return new Date(appointment.TIME_SLOT).toLocaleTimeString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true
+            });
+        });
+
+        res.json({ bookedSlots: bookedTimes });
+    });
+});
+
+
+
+
+
 module.exports = router;

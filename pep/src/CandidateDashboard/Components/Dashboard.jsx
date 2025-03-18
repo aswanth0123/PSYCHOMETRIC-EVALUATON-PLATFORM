@@ -244,8 +244,8 @@ const Dashboard = () => {
                         <th>{item.psychologist_first_name} {item.psychologist_last_name}</th>
                         <th>{item.TEST_NAME}</th>
                         <th>{item.TEST_EVALUATION}</th>
-                        <th>{item.TIME_SLOT}</th>
-                      </tr>
+                        <th>{new Date(item.TIME_SLOT).toLocaleString()}</th>
+                        </tr>
                     ))
                   ) : (
                     <tr>
@@ -270,7 +270,7 @@ const Dashboard = () => {
             <table className="table" width="100%" border="1">
                   <thead>
                     <tr>
-                      <th>PAYMENT ID</th>
+                      
                       <th>PSYCHOLOGIST NAME</th>
                       <th>APPOIMENT ID</th>
                       <th>PAYMENT METHOD</th>
@@ -283,18 +283,18 @@ const Dashboard = () => {
                     payments.map((item) => (
                       
                       <tr key={item.PAYMENT_ID}>
-                        <th>{item.PAYMENT_ID}</th>
+                        
 
                         <th>{item.PSYCHOLOGIST_FIRST_NAME}</th>
                         <th>{item.APPOINTMENT_ID}</th>
                         <th>{item.PAYMENT_METHOD}</th>
                         <th>{item.PAYMENT_AMOUNT}</th>
-                        <th>{item.PAYMENT_DATE}</th>
+                        <th>{new Date(item.PAYMENT_DATE).toLocaleString()}</th>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <th colSpan="6">No data available</th>
+                      <th colSpan="5">No data available</th>
                     </tr>
                   )}
                   </tbody>
@@ -350,7 +350,7 @@ const Dashboard = () => {
           <section className="feedback-section">
             <div className="banner feedback-banner">
               <h1>
-              Settings
+              Profile
               </h1>
               <p>You can Update your Profile</p>
             </div>
@@ -400,21 +400,9 @@ const Dashboard = () => {
     />
   </div>
 
-  <div className="mb-4">
-    <label className="block font-medium">Password:</label>
-    <input
-      type="text"
-      name="password"
-      value=""
-      placeholder="if You want to update password Enter new Password here"
-      onChange={handleChange}
-      className="w-full p-2 border rounded"
-    />
-  </div>
 
 
-
-  <button type="submit" className="bg-blue-500 text-white p-2 rounded">
+  <button type="submit" className="test-btn">
     Update Profile
   </button>
 </form>

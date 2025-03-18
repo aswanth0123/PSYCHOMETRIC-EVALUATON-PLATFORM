@@ -20,7 +20,7 @@ const Checkout = () => {
         const order = await res.json();
     
         const options = {
-            key: "rzp_test_sat22BVzlJrymR",
+            key: "rzp_test_MrmbaBWocQQF0J",
             amount: order.amount,
             currency: order.currency,
             name: "My App",

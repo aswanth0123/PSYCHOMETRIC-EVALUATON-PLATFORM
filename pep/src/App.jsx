@@ -17,6 +17,9 @@ import AdminLogin from './AdminLogin';
 import AdminDashboard from './AdminDashboard/Components/Admin';
 import AddQuestion from './AdminDashboard/Components/AddQuestion';
 import Checkout from './AppointmentForm/components/Payments';
+import ForgetPassword from './ForgetPassword';
+import PsychologistForgetPassword from './PsyForget';
+import AdminForgetPassword from './AdminForget';
 function App() {
   return (
     <Router>
@@ -39,7 +42,9 @@ function App() {
           <Route path='/AdminDashboard' element={<AdminDashboard/>}/>
           <Route path="/addquestion" element={<AddQuestion />} />
           <Route path="/payment" element={<Checkout />} />
-
+          <Route path="/forgetpassword" element={<ForgetPassword />} />
+          <Route path="psychologistforgetpassword" element={<PsychologistForgetPassword />}/>
+          <Route path="/AdminForgetPassword" element={<AdminForgetPassword/>} />
         </Routes>
       </div>
     </Router>

@@ -24,7 +24,10 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
+        console.log(data);
+        
         localStorage.setItem("token", data.token); // Store token in localStorage
+        sessionStorage.setItem("admin", JSON.stringify(data.admin));
         alert("Login Successful!");
         navigate("/AdminDashboard"); // Redirect to Dashboard on successful login
       } else {
@@ -55,7 +58,8 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <button type="submit" className="login-btn">Login</button>
+        <a href="/AdminForgetPassword" style={{textDecoration:"none"}}>Forget Password</a>
+        <button type="submit" className="login-btn" style={{marginTop:"10px"}}>Login</button>
       </form>
     </div>
   );

@@ -20,7 +20,8 @@ const P_Dashboard = () => {
   const [payments, setPayments] = useState([]); 
   const [feedback, setFeedback] = useState([]);
   const [message, setMessage] = useState("");
-  const [password, setPassword] = useState("");
+  const [nextAppointmentDate, setNextAppointmentDate] = useState('');
+  
   const [user, setUser] = useState({
     PSYCHOLOGIST_FIRST_NAME: "",
     PSYCHOLOGIST_LAST_NAME : "",
@@ -48,6 +49,10 @@ const P_Dashboard = () => {
       setResult(evaluations.data);
       setTestsData(tests.data);
       setAppoiments(appointments.data);
+      const upcomingAppointments = appointments.data.filter(app => new Date(app.TIME_SLOT) >= new Date());
+      setNextAppointmentDate(
+        upcomingAppointments.length ? new Date(upcomingAppointments[0].TIME_SLOT).toLocaleDateString() : 'No scheduled appointments'
+      );
       setPayments(payments.data);
       setFeedback(feedback.data);
       setUser(psychologists.data);
@@ -112,18 +117,18 @@ const P_Dashboard = () => {
             <div className="dashboard-overview">
               <div className="overview-card">
                 <FaClipboardList className="overview-icon" />
-                <h3>6 Tests Available</h3>
+                <h3>{testsData.length} Tests Available</h3>
                 <p>Start exploring now</p>
               </div>
               <div className="overview-card">
                 <FaCheckCircle className="overview-icon" />
-                <h3>Tests Completed</h3>
-                <p>Select tests to see</p>
+                <h3>{result.length}Test Completed Candidates</h3>
+                <p>Select Reports to see</p>
               </div>
               <div className="overview-card">
                 <FaCalendarAlt className="overview-icon" />
                 <h3>Next Appointment</h3>
-                <p>No scheduled appointments</p>
+                <p>View details on Appointment</p>
               </div>
             </div>
           </div>
@@ -207,7 +212,7 @@ const P_Dashboard = () => {
                         <th>{item.candidate_first_name}</th>
                         <th>{item.TEST_NAME}</th>
                         <th>{item.TEST_EVALUATION}</th>
-                        <th>{item.TIME_SLOT}</th>
+                        <th>{new Date(item.TIME_SLOT).toLocaleString()}</th>
                       </tr>
                     ))
                   ) : (
@@ -252,7 +257,7 @@ const P_Dashboard = () => {
                         <th>{item.APPOINTMENT_ID}</th>
                         <th>{item.PAYMENT_METHOD}</th>
                         <th>{item.PAYMENT_AMOUNT}</th>
-                        <th>{item.PAYMENT_DATE}</th>
+                        <th>{new Date(item.PAYMENT_DATE).toLocaleString()}</th>
                       </tr>
                     ))
                   ) : (
@@ -310,7 +315,7 @@ const P_Dashboard = () => {
           <section className="feedback-section">
             <div className="banner feedback-banner">
               <h1>
-              Settings
+              Profile
               </h1>
               <p>You can Update your Profile</p>
             </div>
@@ -384,7 +389,7 @@ const P_Dashboard = () => {
 
 
 
-              <button type="submit" className="bg-blue-500 text-white p-2 rounded">
+              <button type="submit" className="test-btn">
                 Update Profile
               </button>
             </form>

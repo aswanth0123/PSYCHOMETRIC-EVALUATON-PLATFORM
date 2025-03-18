@@ -52,10 +52,11 @@ router.post("/login", (req, res) => {
                 { expiresIn: "1h" }
             );
 
-            res.status(200).json({ message: "Login successful", token, });
+            res.status(200).json({ message: "Login successful", token,psychologist: psychologist });
         }
     );
 });
+
 router.get("/", (req, res) => {
     db.query("SELECT * FROM psychologist_details", (err, results) => {
         if (err) return res.status(500).json({ error: "Database error", details: err });
@@ -106,6 +107,26 @@ router.get("/:id", (req, res) => {
       res.json({ success: true, message: "Psychologist details updated successfully" });
     });
   });
+  router.post("/verify-email", (req, res) => {
+    const { email } = req.body;
+    
+    db.query("SELECT * FROM psychologist_details WHERE PSYCHOLOGIST_EMAIL_ID = ?", [email], (err, result) => {
+        if (err) return res.status(500).json({ error: "Database error" });
+        if (result.length === 0) return res.status(404).json({ error: "Email not found" });
+        
+        res.json({ message: "Email verified. Proceed to reset password." });
+    });
+});
 
+// Reset Password (Forget Password Step 2)
+router.post("/reset-password", async (req, res) => {
+    const { email, newPassword } = req.body;
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    db.query("UPDATE psychologist_details SET PSYCHOLOGIST_PASSWORD = ? WHERE PSYCHOLOGIST_EMAIL_ID = ?", [hashedPassword, email], (err, result) => {
+        if (err) return res.status(500).json({ error: "Database error" });
+        res.json({ message: "Password reset successfully." });
+    });
+});
 
 module.exports = router;

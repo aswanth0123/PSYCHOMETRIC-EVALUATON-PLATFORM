@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./AddQuestion.css"; // Import CSS
-
+import { useNavigate } from "react-router-dom";
 const AddQuestion = () => {
   const currentTestId = window.location.href.split("testid=")[1];
   console.log(currentTestId);
@@ -11,6 +11,7 @@ const AddQuestion = () => {
   const [correctAnswer, setCorrectAnswer] = useState("");
   const [questionsList, setQuestionsList] = useState([]);
   const testId = window.location.href.split("testid=")[1];
+  const navigate = useNavigate()
   // Fetch Questions from API on Component Mount
   useEffect(() => {
     fetchQuestions();
@@ -66,6 +67,9 @@ const AddQuestion = () => {
   };
 
   return (
+    <>
+
+    <button style={{color:"white",margin:"20px",borderRadius:"10px",border:"1px solid black",backgroundColor:"rgb(48 48 132)"}} onClick={()=>navigate('/AdminDashboard')}>Back to home</button>
     <div className="container2">
       {/* Left Section - Question Form */}
       <div className="form-container">
@@ -111,7 +115,7 @@ const AddQuestion = () => {
       </div>
 
       {/* Right Section - Questions Table */}
-      <div className="table-container">
+      <div className="table-container"  style={{marginLeft:"45px"}}>
         {questionsList.length > 0 && (
           <>
             <h2>Questions List</h2>
@@ -146,6 +150,7 @@ const AddQuestion = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

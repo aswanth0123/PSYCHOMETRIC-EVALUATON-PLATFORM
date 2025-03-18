@@ -113,6 +113,19 @@ const Quiz = () => {
   };
   console.log('task' ,test);
   
+  const count = ()=>{
+    try{
+     const a =question.length
+     setStart(true)
+    }
+    catch{
+      alert("No questions Avilable Choose Another Test")
+      navigate('/dashboard')
+
+      
+    }
+  }
+
   return (
     <div className='container'>
       {!start ? (
@@ -128,7 +141,7 @@ const Quiz = () => {
             <li><b>Scoring:</b> Each correct answer contributes to your final score.</li>
             <li><b>Results & Insights:</b> You will receive a summary of your performance after the test.</li>
           </ol>
-          <button className="start-btn" onClick={() => setStart(true)}>Begin Test!</button>
+          <button className="start-btn" onClick={count}>Begin Test!</button>
         </div>
       ) : !result ? (
         <>

@@ -55,6 +55,7 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
+        <a href="psychologistforgetpassword" style={{ textDecoration: "none",textAlign: "right" }}>forget password</a>
         <button type="submit" className="login-btn" disabled={loading}>
           {loading ? "Logging in..." : "Login"}
         </button>

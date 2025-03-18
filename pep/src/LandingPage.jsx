@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './LandingPage.css';
 import illustration from './assets/illustration.png'
 import axios from 'axios';
+
+
 const LandingPage = () => {
     const [tests, setTests] = useState([]);
     const [feedback,setFeedback] = useState([]);
+
+    const navigate = useNavigate()
     useEffect(() => {
         axios.get('http://localhost:5000/api/tests')
         .then(response => {
@@ -27,6 +31,12 @@ const LandingPage = () => {
     },[])
     // console.log(feedback);
     
+
+    const handleClick = ()=>{
+        console.log('card pressed');
+        navigate('auth')
+    }
+
     return (
         <div className="landing-page">
             {/* Header Section */}
@@ -69,10 +79,10 @@ const LandingPage = () => {
                         <h3>Self-Awareness</h3>
                         <p>Gain a deeper understanding of your personality, strengths, and areas for growth.</p>
                     </div>
-                    <div className="benefit-item">
+                    {/* <div className="benefit-item">
                         <h3>Career Guidance</h3>
                         <p>Discover the best career paths suited to your abilities and interests.</p>
-                    </div>
+                    </div> */}
                     <div className="benefit-item">
                         <h3>Improved Decision Making</h3>
                         <p>Make informed decisions in both your personal and professional life.</p>
@@ -89,9 +99,10 @@ const LandingPage = () => {
                 <h2>Available Tests</h2>
                 <div className="tests-grid">
                     {tests.map((test) => (
-                        <div key={test.id} className="test-item">
+                        <div key={test.id} className="test-item" onClick={handleClick}>
                             <h3>{test.TEST_NAME}</h3>
                             <p>{test.TEST_DESCRIPTION}</p>
+
                         </div>
                     ))}
                     {/* <div className="test-item">
@@ -127,7 +138,7 @@ const LandingPage = () => {
                     </ul>
                 </div>
 
-                <button className="btn btn-primary">Book Now</button>
+                <button className="btn btn-primary" onClick={handleClick}>Book Now</button>
             </section>
 
             {/* Feedback Section */}
