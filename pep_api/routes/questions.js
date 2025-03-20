@@ -53,4 +53,27 @@ router.get("/", (req, res) => {
     });
 });
 
+router.delete("/:id",(req,res)=>{
+    const {id}=req.params;
+    const deleteqry = "DELETE FROM questions WHERE ID = ?"
+    db.query(deleteqry,[id],(err,result)=>{
+        if (err) {
+            console.error("Error fetching questions:", err);
+            return res.status(500).json({ message: "Database error" });
+        }
+        res.json(result);
+    })
+})
+router.put("/:id", (req, res) => {
+    const { id } = req.params;
+    const { question_text, option_a, option_b, option_c, option_d, correct_option, test_id } = req.body;
+    const sql = "UPDATE questions SET question_text=?, option_a=?, option_b=?, option_c=?, option_d=?, correct_option=?, test_id=? WHERE id=?";
+    db.query(sql, [question_text, option_a, option_b, option_c, option_d, correct_option, test_id, id], (err, result) => {
+      if (err) {
+        console.error("Error updating question:", err);
+        return res.status(500).json({ error: "Database error" });
+      }
+      res.json({ message: "Question updated successfully" });
+    });
+  });
 module.exports = router;

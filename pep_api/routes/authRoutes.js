@@ -2,6 +2,8 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const db = require("../db");
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -104,5 +106,70 @@ router.put("/:id", (req, res) => {
         res.json({ success: true, message: "Profile updated successfully" });
     });
 });
+
+
+
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+let otpStorage = {};
+router.post("/send-otp", async (req, res) => {
+  const { email } = req.body;
+
+  // Check if email exists in database
+  db.query("SELECT * FROM candidates WHERE email = ?", [email], async (err, result) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({ error: "Database error" });
+    }
+    if (result.length === 0) {
+      return res.status(400).json({ error: "Email not found!" });
+    }
+    
+    console.log('Sending OTP to:', email);
+    
+    // Generate OTP
+    const otp = crypto.randomInt(1000, 9999).toString();
+    otpStorage[email] = otp;
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Your OTP Code",
+      text: `Your OTP is: ${otp}. It is valid for 5 minutes.`,
+    };
+
+    console.log('Generated OTP:', otp);
+
+    try {
+      let info = await transporter.sendMail(mailOptions);
+      console.log("✅ OTP email sent successfully to:", email, "Message ID:", info);
+      res.status(200).json({ message: "OTP sent successfully!" });
+  } catch (err) {
+      console.error("❌ Email sending error:", err);
+      res.status(500).json({ error: "Failed to send OTP. Please try again later." });
+  }
+  
+  });
+});
+
+
+
+router.post("/verify-otp", (req, res) => {
+    const { email, otp } = req.body;
+    if (otpStorage[email] === otp) {
+      delete otpStorage[email]; // Remove OTP after verification
+      res.status(200).json({ message: "OTP verified successfully!" });
+    } else {
+      res.status(400).json({ error: "Invalid OTP" });
+    }
+  });
+
+
+
 
 module.exports = router;

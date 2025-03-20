@@ -22,6 +22,9 @@ const Dashboard = () => {
   const [payments, setPayments] = useState([]);
   const [nextAppointmentDate, setNextAppointmentDate] = useState('');
   const [feedback, setFeedback] = useState([]); 
+  const [review,setReview] = useState(null);
+  const [editing, setEditing] = useState(false);
+  
   
   const candidateId = loggedInUser.id;
   const [user, setUser] = useState({
@@ -49,9 +52,12 @@ const Dashboard = () => {
       if (Array.isArray(evaluationsRes.data)) {
         setResult(evaluationsRes.data.filter(item => item.ID === candidateId));
       }
-  
+      console.log('apoi',appointmentsRes.data);
+      
       if (Array.isArray(appointmentsRes.data)) {
         const filteredAppointments = appointmentsRes.data.filter(item => item.candidate_id === candidateId);
+        console.log('filteredAppointments',filteredAppointments);
+        
         setAppoiments(filteredAppointments);
   
         const upcomingAppointments = filteredAppointments.filter(app => new Date(app.TIME_SLOT) >= new Date());
@@ -126,8 +132,34 @@ const Dashboard = () => {
   };
 
   // console.log(loggedInUser);
-  
+  const handleDeleteReview = async (reviewId) => {
+    axios.delete(`http://localhost:5000/api/feedback/${reviewId}`).then((response)=>{
+      fetchData();
+    }).catch((error)=>{
+      console.log(error);
+    })
+  }
 
+  const handleSave = async (reviewId) => {
+    // console.log('reviewId',review);
+    
+    axios.put(`http://localhost:5000/api/feedback/${reviewId}`, review).then((response)=>{
+      fetchData();
+      // console.log('data');
+      
+    }).catch((error)=>{
+      console.log(error);
+    })
+  }
+  const handleEditReview = async (item) => {
+    setReview(item); 
+    setEditing(true);
+  }
+  const handleBookappointment = () =>{
+    sessionStorage.setItem('quiz',null);
+    sessionStorage.setItem('testEvaluationId',null);
+    navigate('/appointment');
+  }
 
   return (
     <div className="dashboard-container">
@@ -154,6 +186,11 @@ const Dashboard = () => {
                 <FaCheckCircle className="overview-icon" />
                 <h3>{result.length} Tests Completed</h3>
                 <p>Select tests to see</p>
+              </div>
+              <div className="overview-card">
+                <FaCalendarAlt className="overview-icon" />
+                <h3>Book Appointment</h3>
+                <a href="" onClick={handleBookappointment} style={{textDecoration:'none'}}>Click Here</a>
               </div>
               <div className="overview-card">
                 <FaCalendarAlt className="overview-icon" />
@@ -242,8 +279,8 @@ const Dashboard = () => {
                         <th>{item.APPOINTMENT_ID}</th>
 
                         <th>{item.psychologist_first_name} {item.psychologist_last_name}</th>
-                        <th>{item.TEST_NAME}</th>
-                        <th>{item.TEST_EVALUATION}</th>
+                        <th>{item.TEST_NAME || "No Data"}</th>
+                        <th>{item.TEST_EVALUATION || "No Data"}</th>
                         <th>{new Date(item.TIME_SLOT).toLocaleString()}</th>
                         </tr>
                     ))
@@ -314,7 +351,15 @@ const Dashboard = () => {
             <div>
               Add Feedback <button className="test-btn" onClick={handleAdd}>Click here</button>
             </div>
-            <table className="table" width="100%" border="1">
+            {editing &&(
+              <div>
+                <form action="">
+                <input type="text" value={review.FEEDBACK} onChange={(e) => setReview({ ...review, FEEDBACK: e.target.value })} />
+                <button onClick={()=>handleSave(review.FEEDBACK_ID)} className="test-btn">Update</button>
+                </form>
+              </div>
+            )}
+            <table className="table" width="100%" >
                   <thead>
                     <tr>
                       <th>Feedback ID</th>
@@ -332,6 +377,8 @@ const Dashboard = () => {
 
                         <th>{item.CANDIDATE_NAME}</th>
                         <th>{item.FEEDBACK}</th>
+                        {item.CANDIDATE_ID == candidateId && <td style={{border:"none"}}><button onClick={() => handleEditReview(item)} className="test-btn">Edit</button> <button onClick={() => handleDeleteReview(item.FEEDBACK_ID)} className="test-btn">Delete</button></td>}
+                    
 
                       </tr>
                     ))

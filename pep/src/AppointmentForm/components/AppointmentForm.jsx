@@ -8,14 +8,19 @@ const AppointmentForm = () => {
   const [selectedTime, setSelectedTime] = useState(null);
   const [confirmationMessage, setConfirmationMessage] = useState("");
   const [bookedSlots, setBookedSlots] = useState([]); // Store booked slots
-  console.log(bookedSlots, "=============");
-  console.log(selectedDate);
+  // console.log(bookedSlots, "=============");
+  // console.log(selectedDate);
   const navigate = useNavigate();
 
   // Psychologist & Test details
   const psychologistId = 1;
-  const testId = sessionStorage.getItem("quiz");
-  const testEvaluationId = sessionStorage.getItem("testEvaluationId");
+  let testId = sessionStorage.getItem("quiz");
+  let testEvaluationId = sessionStorage.getItem("testEvaluationId");
+
+  if(testId=="null" && testEvaluationId=="null"){
+    testId=null
+    testEvaluationId=null
+  }
 
   // Generate next 7 days for booking
   const generateDates = () => {
@@ -95,32 +100,13 @@ const AppointmentForm = () => {
       TEST_EVALUATION_ID: testEvaluationId,
       TIME_SLOT: timeSlot,
     };
+    sessionStorage.setItem("appointmentData", JSON.stringify(appointmentData));
+    console.log("appointmentData", sessionStorage.getItem("appointmentData"));
 
-    try {
-      const response = await axios.post(
-        "http://localhost:5000/api/appointments/",
-        appointmentData,
-        { headers: { "Content-Type": "application/json" } }
-      );
+    setTimeout(() => {
+      navigate("/payment");
+    }, 1000);
 
-      console.log("✅ Appointment Created:", response.data);
-
-      setConfirmationMessage(`Appointment successfully booked on ${timeSlot}.`);
-      sessionStorage.setItem(
-        "appointment",
-        JSON.stringify(response.data.APPOINTMENT_ID)
-      );
-
-      setTimeout(() => {
-        navigate("/payment");
-      }, 1000);
-    } catch (error) {
-      console.error(
-        "❌ Error creating appointment:",
-        error.response?.data || error.message
-      );
-      alert("Failed to create appointment. Please try again.");
-    }
   };
 
   return (

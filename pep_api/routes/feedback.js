@@ -53,4 +53,29 @@ router.post("/", (req, res) => {
   });
 });
 
+
+router.delete("/:id", (req, res) => {
+    const { id } = req.params;
+    const sql = "DELETE FROM feedback WHERE FEEDBACK_ID = ?";
+    db.query(sql, [id], (err, result) => {
+      if (err) {
+        console.error("Database Error:", err);
+        return res.status(500).json({ error: err.message });
+      }
+      res.json({ success: true, message: "Feedback deleted successfully" });
+    });
+  });
+
+  router.put("/:id", (req, res) => {
+    const { id } = req.params;
+    const { FEEDBACK } = req.body;
+    const sql = "UPDATE feedback SET FEEDBACK = ? WHERE FEEDBACK_ID = ?";
+    db.query(sql, [FEEDBACK, id], (err, result) => {
+      if (err) {
+        console.error("Database Error:", err);
+        return res.status(500).json({ error: err.message });
+      }
+      res.json({ success: true, message: "Feedback updated successfully" });
+    });
+  })
 module.exports = router;

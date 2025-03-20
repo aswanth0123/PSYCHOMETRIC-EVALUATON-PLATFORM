@@ -245,8 +245,8 @@ const admin1 = JSON.parse(sessionStorage.getItem('admin'))
                             <td>{appointment.candidate_phone}</td>
                             <td>{appointment.candidate_email}</td>
                             <td>{appointment.psychologist_first_name} {appointment.psychologist_last_name}</td>
-                            <td>{appointment.TEST_NAME}</td>
-                            <td>{appointment.TEST_EVALUATION}</td>
+                            <td>{appointment.TEST_NAME || "No Data"}</td>
+                            <td>{appointment.TEST_EVALUATION || "No Data"}</td>
                             <td>{new Date(appointment.TIME_SLOT).toLocaleString()}</td>
                         </tr>
                     ))}
