@@ -146,14 +146,18 @@ export default function AuthForm() {
                     <input type="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange} />
                     {errors.password && <p className="error">{errors.password}</p>}
 
-                    {isLogin && (
-                    <a href="forgetpassword" style={{ textDecoration: "none",marginBottom:"50px" }}>Forget Password</a>
-                    )
-                    }
+
                     <button type="submit" disabled={loading}>{loading ? "Processing..." : isLogin ? "Login" : "SignUp"}</button>
+
                 </form>
 
                 <Link to="/" className="btn btn-secondary">Back to Home</Link>
+                {isLogin && (
+                        <div style={{width:"100%",textAlign:"end",marginTop:"20px" }}>
+                            <a href="forgetpassword" style={{ textDecoration: "none",marginBottom:"50px" }}>Forget Password ?</a>
+                        </div>
+                    )
+                    }
             </div>
         </div>
     );

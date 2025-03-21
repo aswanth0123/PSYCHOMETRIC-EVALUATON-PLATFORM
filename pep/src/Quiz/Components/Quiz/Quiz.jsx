@@ -57,7 +57,7 @@ const Quiz = () => {
     try {
         const response = await axios.post("http://localhost:5000/api/test-evaluations/", {
             CANDIDATE_ID: JSON.parse(sessionStorage.getItem("user")).id,
-            TEST_ID: 1,
+            TEST_ID: testid,
             TEST_EVALUATION: `Score: ${score}/${data.length}, Performance: ${getPerformanceMessage(score)}`
         });
 
@@ -72,7 +72,7 @@ const Quiz = () => {
   const next = () => {
     if (lock) {
       if (index === data.length - 1) {
-        sessionStorage.setItem("quiz", 1);
+        sessionStorage.setItem("quiz", testid);
         storeResult();  // Automatically store result before finishing test
         setResult(true);
         return;

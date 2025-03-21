@@ -24,6 +24,7 @@ const Dashboard = () => {
   const [feedback, setFeedback] = useState([]); 
   const [review,setReview] = useState(null);
   const [editing, setEditing] = useState(false);
+  console.log(loggedInUser);
   
   
   const candidateId = loggedInUser.id;
@@ -187,10 +188,10 @@ const Dashboard = () => {
                 <h3>{result.length} Tests Completed</h3>
                 <p>Select tests to see</p>
               </div>
-              <div className="overview-card">
+              <div className="overview-card" onClick={handleBookappointment}>
                 <FaCalendarAlt className="overview-icon" />
                 <h3>Book Appointment</h3>
-                <a href="" onClick={handleBookappointment} style={{textDecoration:'none'}}>Click Here</a>
+                {/* <a href=""  style={{textDecoration:'none'}}>Click Here</a> */}
               </div>
               <div className="overview-card">
                 <FaCalendarAlt className="overview-icon" />
@@ -258,10 +259,38 @@ const Dashboard = () => {
           <section className="appointments-section">
             <div className="appointments-banner">
               <h1>📅 My Appointments</h1>
-              <p>Schedule consultations with our expert</p>
+              <p>Schedule consultations with our expert </p>
+              <button className="reports-btn" onClick={()=>navigate('/appointment')}>Book Appointment</button>
             </div>
-          
-            <table className="table" width="100%" border="1">
+            <div className="dashboard-overview" style={{marginTop:'20px'}}>
+
+            {appoiments.length > 0 ? (
+                    appoiments.map((item) => (
+            <div className="overview-card">
+                <FaClipboardList className="overview-icon" />
+                <h3>{item.psychologist_first_name} {item.psychologist_last_name}</h3>
+                <p>Test Name :{item.TEST_NAME || "No Test Attended"} </p>
+                <p>
+                 Score: {item.TEST_EVALUATION 
+                    ? item.TEST_EVALUATION.split(",")[0].replace("Score:", "").trim() 
+                    : "No Score"}
+                </p>
+                <p>
+                Performance : {item.TEST_EVALUATION 
+                    ? item.TEST_EVALUATION.split(",")[1].replace("Performance:", "").trim() 
+                    : "No Performance"}
+                </p>
+                <p><b>Date: {new Date(item.TIME_SLOT).toLocaleDateString()} </b></p>
+                <p><b>Time: {new Date(item.TIME_SLOT).toLocaleTimeString()} </b></p>
+              </div>
+                              ))
+                            ) : (
+                              <tr>
+                                <th colSpan="5">No data available</th>
+                              </tr>
+                            )}
+                          </div>
+            {/* <table className="table" width="100%" border="1">
                   <thead>
                     <tr>
                       <th>APPOINTMENT_ID</th>
@@ -288,9 +317,9 @@ const Dashboard = () => {
                     <tr>
                       <th colSpan="5">No data available</th>
                     </tr>
-                  )}
-                  </tbody>
-                </table>
+                  )} */}
+                  {/* </tbody> */}
+                {/* </table> */}
 
           </section>
         )}

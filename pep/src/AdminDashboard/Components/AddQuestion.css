@@ -20,7 +20,7 @@
   padding: 10px;
 }
 .questions-table,th,td{
-  border: 3px solid #1e1a1acb;
+  border: 2px solid #565151cb;
   border-collapse: collapse;
 }
 td{

@@ -154,15 +154,15 @@ const P_Dashboard = () => {
           <section className="reports">
             <div className="banner reports-banner">
               <h1>📑 My Results</h1>
-              <p>View and analyze your test results.</p>
+              <p>View and analyze test results.</p>
             </div>
             <table className="table" width="100%" border="1">
-                  <thead>
+                  <thead >
                     <tr>
                       <th>TEST NAME</th>
                       <th>Candidate Name</th>
-                      <th>TEST_EVALUATION</th>
-                    </tr>
+                      <th>Score</th>
+                      <th>Performance</th>                    </tr>
                   </thead>
                   <tbody>
                   {result.length > 0 ? (
@@ -171,8 +171,13 @@ const P_Dashboard = () => {
                       <tr key={item.TEST_EVALUATION_ID}>
                         <th>{item.TEST_NAME}</th>
                         <th>{item.first_name} {item.last_name}</th>
-                        <th>{item.TEST_EVALUATION}</th>
-                      </tr>
+                        <th>{item.TEST_EVALUATION 
+                    ? item.TEST_EVALUATION.split(",")[0].replace("Score:", "").trim() 
+                    : "No Score"}</th>
+                            <th> {item.TEST_EVALUATION 
+                    ? item.TEST_EVALUATION.split(",")[1].replace("Performance:", "").trim() 
+                    : "No Performance"}</th>
+                                          </tr>
                     ))
                   ) : (
                     <tr>
@@ -198,8 +203,10 @@ const P_Dashboard = () => {
                       <th>APPOINTMENT_ID</th>
                       <th>CANDIDATE NAME</th>
                       <th>TEST NAME</th>
-                      <th>TEST RESULT</th>
-                      <th>TIME SLOT</th>
+                      <th>TEST SCORE</th>
+                      <th>TEST PERFORMANCE</th>
+                      <th>TIME DATE</th>
+                      <th>TIME TIME</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -211,8 +218,14 @@ const P_Dashboard = () => {
 
                         <th>{item.candidate_first_name}</th>
                         <th>{item.TEST_NAME}</th>
-                        <th>{item.TEST_EVALUATION}</th>
-                        <th>{new Date(item.TIME_SLOT).toLocaleString()}</th>
+                        <th>{item.TEST_EVALUATION 
+                    ? item.TEST_EVALUATION.split(",")[0].replace("Score:", "").trim() 
+                    : "No Score"}</th>
+                            <th> {item.TEST_EVALUATION 
+                    ? item.TEST_EVALUATION.split(",")[1].replace("Performance:", "").trim() 
+                    : "No Performance"}</th>                       
+                     <th>{new Date(item.TIME_SLOT).toLocaleDateString()}</th>
+                     <th>{new Date(item.TIME_SLOT).toLocaleTimeString()}</th>
                       </tr>
                     ))
                   ) : (
@@ -244,6 +257,7 @@ const P_Dashboard = () => {
                       <th>PAYMENT METHOD</th>
                       <th>AMOUNT</th>
                       <th>DATE</th>
+                      <th>TIME</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -257,8 +271,8 @@ const P_Dashboard = () => {
                         <th>{item.APPOINTMENT_ID}</th>
                         <th>{item.PAYMENT_METHOD}</th>
                         <th>{item.PAYMENT_AMOUNT}</th>
-                        <th>{new Date(item.PAYMENT_DATE).toLocaleString()}</th>
-                      </tr>
+                        <th>{new Date(item.PAYMENT_DATE).toLocaleDateString()}</th>
+                        <th>{new Date(item.PAYMENT_DATE).toLocaleTimeString()}</th>                      </tr>
                     ))
                   ) : (
                     <tr>

@@ -58,7 +58,7 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <a href="/AdminForgetPassword" style={{textDecoration:"none"}}>Forget Password</a>
+        {/* <a href="/AdminForgetPassword" style={{textDecoration:"none"}}>Forget Password</a> */}
         <button type="submit" className="login-btn" style={{marginTop:"10px"}}>Login</button>
       </form>
     </div>

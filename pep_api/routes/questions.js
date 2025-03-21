@@ -9,7 +9,7 @@ const createTableQuery = `CREATE TABLE IF NOT EXISTS questions (
     option_b VARCHAR(255) NOT NULL,
     option_c VARCHAR(255) NOT NULL,
     option_d VARCHAR(255) NOT NULL,
-    correct_option VARCHAR(10) NOT NULL,
+    correct_option VARCHAR(255) NOT NULL,
     test_id INT NOT NULL,
     FOREIGN KEY (test_id) REFERENCES test_details(TEST_ID)
 );

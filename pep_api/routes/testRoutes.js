@@ -66,6 +66,21 @@ router.put("/update-task/:id", (req, res) => {
     });
 });
 
+router.get("/:id", (req, res) => {
+    const { id } = req.params;
+    const sql = "SELECT * FROM test_details WHERE TEST_ID = ?";
+    db.query(sql, [id], (err, result) => {
+        if (err) {
+            console.error("Database Error:", err);
+            return res.status(500).json({ error: err.message });
+        }
+        if (result.length === 0) {
+            return res.status(404).json({ error: "Test not found" });
+        }
+        res.json(result);
+    });
+});
+
 // ✅ **4. Delete a test by ID (DELETE)**
 router.delete("/:id", (req, res) => {
     const { id } = req.params;
