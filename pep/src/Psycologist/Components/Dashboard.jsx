@@ -441,7 +441,11 @@ const P_Dashboard = () => {
               >
                 <FaCalendarAlt className="overview-icon" />
                 <h3>Next Appointment</h3>
-                <p>{new Date(nextAppointmentDate.TIME_SLOT).toLocaleDateString()}</p>
+                {nextAppointmentDate ? (
+  <p>{new Date(nextAppointmentDate.TIME_SLOT).toLocaleDateString()}</p>
+) : (
+  <p>No appointments</p>
+)}   
               </div>
             </div>
           </div>
