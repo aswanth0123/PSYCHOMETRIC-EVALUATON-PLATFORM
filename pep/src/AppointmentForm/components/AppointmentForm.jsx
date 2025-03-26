@@ -8,12 +8,26 @@ const AppointmentForm = () => {
   const [selectedTime, setSelectedTime] = useState(null);
   const [confirmationMessage, setConfirmationMessage] = useState("");
   const [bookedSlots, setBookedSlots] = useState([]); // Store booked slots
+  const [psychologist, setPsychologist] = useState([]);
   // console.log(bookedSlots, "=============");
   // console.log(selectedDate);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    fetchPsychologist();
+  }, []);
+
+  const fetchPsychologist = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/psychologist");
+      setPsychologist(response.data[0]);
+    } catch (error) {
+      console.error("Error fetching psychologist:", error);
+    }
+  };
+
   // Psychologist & Test details
-  const psychologistId = 1;
+  const psychologistId = psychologist.PSYCHOLOGIST_ID;
   let testId = sessionStorage.getItem("quiz");
   let testEvaluationId = sessionStorage.getItem("testEvaluationId");
 
@@ -99,6 +113,7 @@ const AppointmentForm = () => {
       TEST_ID: testId,
       TEST_EVALUATION_ID: testEvaluationId,
       TIME_SLOT: timeSlot,
+      STATUS: "pending",
     };
     sessionStorage.setItem("appointmentData", JSON.stringify(appointmentData));
     console.log("appointmentData", sessionStorage.getItem("appointmentData"));
@@ -113,13 +128,13 @@ const AppointmentForm = () => {
     <div className="appointment-container">
       {/* Psychologist Information */}
       <div className="psychologist-info">
-        <h2>Dr. Psychologist</h2>
-        <p>PhD in Clinical Psychology | 10+ Years Experience</p>
+        <h2>Dr. {psychologist.PSYCHOLOGIST_FIRST_NAME} {psychologist.PSYCHOLOGIST_LAST_NAME}</h2>
+        <p>{psychologist.PSYCHOLOGIST_CERTIFICATIONS} </p>
       </div>
 
       {/* Appointment Form */}
       <form onSubmit={handleSubmit} className="appointment-form">
-        <h3>Candidate ID: {JSON.parse(sessionStorage.getItem("user")).id}</h3>
+        <h3>Candidate Name: {JSON.parse(sessionStorage.getItem("user")).name}</h3>
 
         {/* Date Selection */}
         <h3>Select a Date</h3>

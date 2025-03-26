@@ -35,9 +35,11 @@ app.use("/api/questions", questionsRoutes);
 const feedbackRoutes = require("./routes/feedback");
 app.use("/api/feedback", feedbackRoutes);
 
+const quizRouter = require("./routes/quizRoutes");
+app.use("/api/quiz", quizRouter);
 
-
-
+const questionResult = require("./routes/questionResult");
+app.use("/api/questionResult", questionResult);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

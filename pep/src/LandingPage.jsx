@@ -21,7 +21,7 @@ const LandingPage = () => {
 
         axios.get('http://localhost:5000/api/feedback')
         .then(response => {
-            const latestFeedback = response.data.slice(-4); // Get the last 4 items
+            const latestFeedback = response.data
             setFeedback(latestFeedback.reverse());
         })
         .catch(error => {

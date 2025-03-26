@@ -130,6 +130,31 @@
   opacity: 0.9;
 }
 
+
+.dashboard-overview1 {
+  display: grid;
+  justify-content: center; /* Center alignment */
+  gap: 20px;
+  grid-template-columns: auto auto auto;
+}
+
+.overview-card1 {
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.2s;
+  width: 250px; /* Card size */
+  margin: 0 auto; /* Ensure it stays centered */
+}
+
+.overview-card1:hover {
+  transform: translateY(-5px);
+}
+
+
+
 /* Dashboard Overview Cards */
 .dashboard-overview {
   display: flex;
@@ -159,7 +184,7 @@
   margin: 10px 0;
 }
 
-.overview-card p {
+.overview-card,.overview-card1 p {
   font-size: 14px;
   color: #555;
 }

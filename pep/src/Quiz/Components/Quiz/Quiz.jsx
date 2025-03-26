@@ -12,6 +12,9 @@ const Quiz = () => {
   let [result, setResult] = useState(false);
   let [start, setStart] = useState(false); // Start screen state
   let [test,setTest] = useState({})
+  let [testattend,setTestAttend] = useState(null)
+  let [currentoption,setCurrentOption] = useState(null)
+  let [iscorrect,setIsCorrect] = useState(false)
   let Option1 = useRef(null);
   let Option2 = useRef(null);
   let Option3 = useRef(null);
@@ -40,9 +43,12 @@ const Quiz = () => {
   // Function to check answer
   const checkAns = (e, ans) => {
     if (!lock) {
+      setCurrentOption(ans)
       if (question.correct_option == ans) {
         e.target.classList.add('correct');
+        setIsCorrect(true);
         setScore((prev) => prev + 1);
+
         
 
       } else {
@@ -58,7 +64,8 @@ const Quiz = () => {
         const response = await axios.post("http://localhost:5000/api/test-evaluations/", {
             CANDIDATE_ID: JSON.parse(sessionStorage.getItem("user")).id,
             TEST_ID: testid,
-            TEST_EVALUATION: `Score: ${score}/${data.length}, Performance: ${getPerformanceMessage(score)}`
+            TEST_EVALUATION: `Score: ${score}/${data.length}, Performance: ${getPerformanceMessage(score)}`,
+            TEST_ATTEND_ID: testattend
         });
 
         const testEvaluationId = response.data.TEST_EVALUATION_ID; // Extract ID from response
@@ -68,18 +75,42 @@ const Quiz = () => {
         console.error("Error saving test evaluation:", error.response ? error.response.data : error.message);
     }
 };
+
+
+const addquestiondata = () => {
+
+  const questiondata = {
+    CANDIDATE_ID: JSON.parse(sessionStorage.getItem("user")).id,
+    TEST_ID: testid,
+    QUESTION_ID: question.id,
+    SELECTED_OPTION: currentoption,
+    IS_CORRECT: iscorrect,
+    TEST_ATTEND_ID: testattend
+
+  }
+  // console.log('testattend',questiondata);
+  
+   axios.post("http://localhost:5000/api/questionResult/test-responses", questiondata);
+      
+    
+  // }
+}
+
+
   // Function to handle next question
   const next = () => {
     if (lock) {
       if (index === data.length - 1) {
         sessionStorage.setItem("quiz", testid);
-        storeResult();  // Automatically store result before finishing test
+        storeResult(); 
+        addquestiondata();
         setResult(true);
         return;
       }
       setIndex(++index);
       setQuestion(data[index]);
       setLock(false);
+      addquestiondata();
       option_array.forEach((option) => {
         option.current.classList.remove('wrong');
         option.current.classList.remove('correct');
@@ -111,12 +142,26 @@ const Quiz = () => {
   const book = () => {
     navigate('/appointment');
   };
-  console.log('task' ,test);
+  // console.log('task' ,test);
+  const handleTestAttend = async () => {
+    try {
+      const response = await axios.post("http://localhost:5000/api/quiz/test-attend", {
+        CANDIDATE_ID: JSON.parse(sessionStorage.getItem("user")).id
+      });
   
-  const count = ()=>{
+      console.log("testattend response:", response.data);
+  
+      // Set the TEST_ATTEND_ID correctly
+      setTestAttend(response.data.TEST_ATTEND_ID);
+    } catch (error) {
+      console.error("Error in testattend request:", error);
+    }
+  };
+   const count = ()=>{
     try{
      const a =question.length
      setStart(true)
+     handleTestAttend() 
     }
     catch{
       alert("No questions Avilable Choose Another Test")
@@ -125,7 +170,8 @@ const Quiz = () => {
       
     }
   }
-
+  // console.log('testattend1',testattend);
+  
   return (
     <div className='container'>
       {!start ? (

@@ -4,7 +4,15 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import { Document, Packer, Paragraph, Table, TableRow, TableCell, TextRun } from "docx";
+import {
+  Document,
+  Packer,
+  Paragraph,
+  Table,
+  TableRow,
+  TableCell,
+  TextRun,
+} from "docx";
 
 const AdminDashboard = () => {
   const [psychologists, setPsychologists] = useState([]);
@@ -12,12 +20,15 @@ const AdminDashboard = () => {
   const [evaluations, setEvaluations] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [payments, setPayments] = useState([]);
-  const [card,setCard] = useState(true)
-  const [editing,setEditing] = useState(false)
-  const [adding,setAdding] = useState(false)
-  const [newdata,setNewdata] = useState({TEST_NAME:'',TEST_DESCRIPTION:''})
-  const [editdata,setEditdata] = useState(null)
-  const [updatedTask,setUpdatedTask] = useState(null)
+  const [card, setCard] = useState(true);
+  const [editing, setEditing] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [newdata, setNewdata] = useState({
+    TEST_NAME: "",
+    TEST_DESCRIPTION: "",
+  });
+  const [editdata, setEditdata] = useState(null);
+  const [updatedTask, setUpdatedTask] = useState(null);
   const [search, setSearch] = useState("");
   const [searcha1, setSearcha1] = useState("");
   const [searchb1, setSearchb1] = useState("");
@@ -27,7 +38,7 @@ const AdminDashboard = () => {
   const [searchf1, setSearchf1] = useState("");
   const [fromDate1, setFromDate1] = useState("");
   const [toDate1, setToDate1] = useState("");
-  const [search2, setSearch2] = useState("");
+  const [status, setStatus] = useState("");
   const [search3, setSearch3] = useState("");
   const [filters, setFilters] = useState({
     evaluationId: "",
@@ -37,12 +48,12 @@ const AdminDashboard = () => {
     performance: "",
   });
   const [admin, setAdmin] = useState({
-    ADMIN_ID: '',
+    ADMIN_ID: "",
     ADMIN_FIRST_NAME: "",
     ADMIN_LAST_NAME: "",
     ADMIN_CONTACT_NO: "",
     ADMIN_EMAIL_ID: "",
-  });    
+  });
   const [payfilters, setPayFilters] = useState({
     id: "",
     candidate: "",
@@ -53,49 +64,49 @@ const AdminDashboard = () => {
     payToDate: "",
   });
   const [message, setMessage] = useState("");
-const admin1 = JSON.parse(sessionStorage.getItem('admin'))
+  const admin1 = JSON.parse(sessionStorage.getItem("admin"));
 
+  const handleFilterChangepay = (e) => {
+    setPayFilters({ ...payfilters, [e.target.name]: e.target.value });
+  };
 
-const handleFilterChangepay = (e) => {
-  setPayFilters({ ...payfilters, [e.target.name]: e.target.value });
-};
+  // Filtering logic
+  const filteredPayments = payments.filter((pay) => {
+    const fullName = `${pay.first_name} ${pay.name}`.toLowerCase();
+    const id = String(pay.PAYMENT_ID);
+    const appointmentId = String(pay.APPOINTMENT_ID);
+    const paymentMethod = pay.PAYMENT_METHOD.toLowerCase();
+    const paymentAmount = String(pay.PAYMENT_AMOUNT);
+    const paymentDate = new Date(pay.PAYMENT_DATE).toLocaleDateString();
+    const paymentTime = new Date(pay.PAYMENT_DATE).toLocaleTimeString();
+    const fromDate = payfilters.payFromDate
+      ? new Date(payfilters.payFromDate)
+      : null;
+    const toDate = payfilters.payToDate ? new Date(payfilters.payToDate) : null;
+    const currentDate = new Date(paymentDate);
 
-// Filtering logic
-const filteredPayments = payments.filter((pay) => {
-  const fullName = `${pay.first_name} ${pay.name}`.toLowerCase();
-  const id = String(pay.PAYMENT_ID);
-  const appointmentId = String(pay.APPOINTMENT_ID);
-  const paymentMethod = pay.PAYMENT_METHOD.toLowerCase();
-  const paymentAmount = String(pay.PAYMENT_AMOUNT);
-  const paymentDate = new Date(pay.PAYMENT_DATE).toLocaleDateString();
-  const paymentTime = new Date(pay.PAYMENT_DATE).toLocaleTimeString();
-  const fromDate = payfilters.payFromDate ? new Date(payfilters.payFromDate) : null;
-  const toDate = payfilters.payToDate ? new Date(payfilters.payToDate) : null;
-  const currentDate = new Date(paymentDate);
+    const isDateInRange =
+      (!fromDate || currentDate >= fromDate) &&
+      (!toDate || currentDate <= toDate);
 
-  const isDateInRange =
-    (!fromDate || currentDate >= fromDate) &&
-    (!toDate || currentDate <= toDate);
-
-  return (
-    id.includes(payfilters.id) &&
-    fullName.includes(payfilters.candidate.toLowerCase()) &&
-    appointmentId.includes(payfilters.appointmentId) &&
-    paymentMethod.includes(payfilters.paymentMethod.toLowerCase()) &&
-    paymentAmount.includes(payfilters.paymentAmount) &&
-    isDateInRange
-  );
-});
-
-
-
-// console.log(admin,'admin');
+    return (
+      id.includes(payfilters.id) &&
+      fullName.includes(payfilters.candidate.toLowerCase()) &&
+      appointmentId.includes(payfilters.appointmentId) &&
+      paymentMethod.includes(payfilters.paymentMethod.toLowerCase()) &&
+      paymentAmount.includes(payfilters.paymentAmount) &&
+      isDateInRange
+    );
+  });
+  const totalPayment = filteredPayments.reduce((total, pay) => {
+    return total + parseFloat(pay.PAYMENT_AMOUNT || 0); // Convert to float & handle null values
+  }, 0); 
+  // console.log(admin,'admin');
   // Function to format the date as MM/DD/YYYY
   const formatDate = (date) => {
     const d = new Date(date);
     return `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`;
   };
-
 
   const exportToExcel = () => {
     const ws = XLSX.utils.json_to_sheet(
@@ -119,40 +130,57 @@ const filteredPayments = payments.filter((pay) => {
   };
   // Function to extract Score and Performance
   const extractScore = (evaluation) =>
-    evaluation ? evaluation.split(",")[0].replace("Score:", "").trim() : "No Score";
+    evaluation
+      ? evaluation.split(",")[0].replace("Score:", "").trim()
+      : "No Score";
   const extractPerformance = (evaluation) =>
-    evaluation ? evaluation.split(",")[1].replace("Performance:", "").trim() : "No Performance";
+    evaluation
+      ? evaluation.split(",")[1].replace("Performance:", "").trim()
+      : "No Performance";
 
   // Filter Appointments based on search input
   const filteredAppointments = appointments.filter((appointment) => {
     const appointmentDate = new Date(appointment.TIME_SLOT);
     const from = fromDate1 ? new Date(fromDate1) : null;
     const to = toDate1 ? new Date(toDate1) : null;
-  
-    // Adjust date ranges to include the entire day
-    if (from) from.setHours(0, 0, 0, 0);  // Set fromDate to start of day (00:00:00)
-    if (to) to.setHours(23, 59, 59, 999); // Set toDate to end of day (23:59:59)
-  
-    return (
-      (searchf1 === "" || appointment.APPOINTMENT_ID.toString().includes(searchf1)) &&
 
+    // Adjust date ranges to include the entire day
+    if (from) from.setHours(0, 0, 0, 0); // Set fromDate to start of day (00:00:00)
+    if (to) to.setHours(23, 59, 59, 999); // Set toDate to end of day (23:59:59)
+
+    return (
+      (searchf1 === "" ||
+        appointment.APPOINTMENT_ID.toString().includes(searchf1)) &&
       (searcha1 === "" ||
-        appointment.candidate_first_name.toLowerCase().includes(searcha1.toLowerCase()) ||
-        appointment.candidate_last_name.toLowerCase().includes(searcha1.toLowerCase())) &&
-        
+        appointment.candidate_first_name
+          .toLowerCase()
+          .includes(searcha1.toLowerCase()) ||
+        appointment.candidate_last_name
+          .toLowerCase()
+          .includes(searcha1.toLowerCase())) &&
       (searchb1 === "" ||
-        appointment.psychologist_first_name.toLowerCase().includes(searchb1.toLowerCase()) ||
-        appointment.psychologist_last_name.toLowerCase().includes(searchb1.toLowerCase())) &&
-        
-      (searchc1 === "" || appointment.TEST_NAME?.toLowerCase().includes(searchc1.toLowerCase())) &&
-      
-      (searchd1 === "" || extractScore(appointment.TEST_EVALUATION).toLowerCase().includes(searchd1.toLowerCase())) &&
-      
-      (searche1 === "" || extractPerformance(appointment.TEST_EVALUATION).toLowerCase().includes(searche1.toLowerCase())) &&
-    
+        appointment.psychologist_first_name
+          .toLowerCase()
+          .includes(searchb1.toLowerCase()) ||
+        appointment.psychologist_last_name
+          .toLowerCase()
+          .includes(searchb1.toLowerCase())) &&
+      (searchc1 === "" ||
+        appointment.TEST_NAME?.toLowerCase().includes(
+          searchc1.toLowerCase()
+        )) &&
+      (searchd1 === "" ||
+        extractScore(appointment.TEST_EVALUATION)
+          .toLowerCase()
+          .includes(searchd1.toLowerCase())) &&
+      (searche1 === "" ||
+        extractPerformance(appointment.TEST_EVALUATION)
+          .toLowerCase()
+          .includes(searche1.toLowerCase())) &&
+        (status === "all" || appointment.STATUS.toLowerCase().includes(status.toLowerCase())) &&
+
       (!from || appointmentDate >= from) && // Check if appointment is on or after the from date
       (!to || appointmentDate <= to)
-      
     );
   });
 
@@ -181,7 +209,6 @@ const filteredPayments = payments.filter((pay) => {
     saveAs(blob, "Appointments_Report.xlsx");
   };
 
-
   const downloadAppointmentsAsDocx = () => {
     const doc = new Document({
       sections: [
@@ -198,8 +225,12 @@ const filteredPayments = payments.filter((pay) => {
                 new TableRow({
                   children: [
                     new TableCell({ children: [new Paragraph("ID")] }),
-                    new TableCell({ children: [new Paragraph("Candidate Name")] }),
-                    new TableCell({ children: [new Paragraph("Psychologist")] }),
+                    new TableCell({
+                      children: [new Paragraph("Candidate Name")],
+                    }),
+                    new TableCell({
+                      children: [new Paragraph("Psychologist")],
+                    }),
                     new TableCell({ children: [new Paragraph("Test Name")] }),
                     new TableCell({ children: [new Paragraph("Score")] }),
                     new TableCell({ children: [new Paragraph("Performance")] }),
@@ -208,27 +239,70 @@ const filteredPayments = payments.filter((pay) => {
                   ],
                 }),
                 // Table Data Rows
-                ...filteredAppointments.map((appointment) =>
-                  new TableRow({
-                    children: [
-                      new TableCell({ children: [new Paragraph(appointment.APPOINTMENT_ID.toString())] }),
-                      new TableCell({
-                        children: [
-                          new Paragraph(`${appointment.candidate_first_name} ${appointment.candidate_last_name}`),
-                        ],
-                      }),
-                      new TableCell({
-                        children: [
-                          new Paragraph(`${appointment.psychologist_first_name} ${appointment.psychologist_last_name}`),
-                        ],
-                      }),
-                      new TableCell({ children: [new Paragraph(appointment.TEST_NAME || "No Data")] }),
-                      new TableCell({ children: [new Paragraph(extractScore(appointment.TEST_EVALUATION))] }),
-                      new TableCell({ children: [new Paragraph(extractPerformance(appointment.TEST_EVALUATION))] }),
-                      new TableCell({ children: [new Paragraph(new Date(appointment.TIME_SLOT).toLocaleDateString())] }),
-                      new TableCell({ children: [new Paragraph(new Date(appointment.TIME_SLOT).toLocaleTimeString())] }),
-                    ],
-                  })
+                ...filteredAppointments.map(
+                  (appointment) =>
+                    new TableRow({
+                      children: [
+                        new TableCell({
+                          children: [
+                            new Paragraph(
+                              appointment.APPOINTMENT_ID.toString()
+                            ),
+                          ],
+                        }),
+                        new TableCell({
+                          children: [
+                            new Paragraph(
+                              `${appointment.candidate_first_name} ${appointment.candidate_last_name}`
+                            ),
+                          ],
+                        }),
+                        new TableCell({
+                          children: [
+                            new Paragraph(
+                              `${appointment.psychologist_first_name} ${appointment.psychologist_last_name}`
+                            ),
+                          ],
+                        }),
+                        new TableCell({
+                          children: [
+                            new Paragraph(appointment.TEST_NAME || "No Data"),
+                          ],
+                        }),
+                        new TableCell({
+                          children: [
+                            new Paragraph(
+                              extractScore(appointment.TEST_EVALUATION)
+                            ),
+                          ],
+                        }),
+                        new TableCell({
+                          children: [
+                            new Paragraph(
+                              extractPerformance(appointment.TEST_EVALUATION)
+                            ),
+                          ],
+                        }),
+                        new TableCell({
+                          children: [
+                            new Paragraph(
+                              new Date(
+                                appointment.TIME_SLOT
+                              ).toLocaleDateString()
+                            ),
+                          ],
+                        }),
+                        new TableCell({
+                          children: [
+                            new Paragraph(
+                              new Date(
+                                appointment.TIME_SLOT
+                              ).toLocaleTimeString()
+                            ),
+                          ],
+                        }),
+                      ],
+                    })
                 ),
               ],
             }),
@@ -236,29 +310,14 @@ const filteredPayments = payments.filter((pay) => {
         },
       ],
     });
-  
+
     // Generate and download DOCX
     Packer.toBlob(doc).then((blob) => {
       saveAs(blob, "Filtered_Appointments.docx");
     });
   };
+
   
-  
-
-
-
-
-  const filteredPsychologists = psychologists.filter((psychologist) => {
-    return (
-      psychologist.PSYCHOLOGIST_FIRST_NAME.toLowerCase().includes(search2.toLowerCase()) ||
-      psychologist.PSYCHOLOGIST_LAST_NAME.toLowerCase().includes(search2.toLowerCase()) ||
-      formatDate(psychologist.PSYCHOLOGIST_DOB).includes(search2) ||
-      psychologist.PSYCHOLOGIST_GENDER.toLowerCase().includes(search2.toLowerCase()) ||
-      psychologist.PSYCHOLOGIST_CONTACT_NO.includes(search2) ||
-      psychologist.PSYCHOLOGIST_EMAIL_ID.toLowerCase().includes(search2.toLowerCase()) ||
-      psychologist.PSYCHOLOGIST_CERTIFICATIONS.toLowerCase().includes(search2.toLowerCase())
-    );
-  });
 
   // Function to export data to Excel
   const exportToExcel2 = () => {
@@ -282,8 +341,6 @@ const filteredPayments = payments.filter((pay) => {
 
     saveAs(blob, "Psychologists_Report.xlsx");
   };
-
-
 
   // Filter Tests based on search input
   const filteredTests = tests.filter((test) => {
@@ -311,68 +368,67 @@ const filteredPayments = payments.filter((pay) => {
     saveAs(blob, "Tests_Report.xlsx");
   };
 
-
-
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchData();
-
   }, []);
-    const fetchData = async () => {
-      try {
-        const [psychologistsRes, testsRes, evaluationsRes, appointmentsRes, paymentsRes,userRes] = await Promise.all([
-          axios.get("http://localhost:5000/api/psychologist"),
-          axios.get("http://localhost:5000/api/tests"),
-          axios.get("http://localhost:5000/api/test-evaluations"),
-          axios.get("http://localhost:5000/api/appointments"),
-          axios.get("http://localhost:5000/api/payments/"),
-          axios.get(`http://localhost:5000/api/admin/${admin1.ADMIN_ID}`)
+  const fetchData = async () => {
+    try {
+      const [
+        psychologistsRes,
+        testsRes,
+        evaluationsRes,
+        appointmentsRes,
+        paymentsRes,
+        userRes,
+      ] = await Promise.all([
+        axios.get("http://localhost:5000/api/psychologist"),
+        axios.get("http://localhost:5000/api/tests"),
+        axios.get("http://localhost:5000/api/test-evaluations"),
+        axios.get("http://localhost:5000/api/appointments"),
+        axios.get("http://localhost:5000/api/payments/"),
+        axios.get(`http://localhost:5000/api/admin/${admin1.ADMIN_ID}`),
+      ]);
 
-        ]);
-
-        setPsychologists(psychologistsRes.data);
-        setTests(testsRes.data);
-        setEvaluations(evaluationsRes.data);
-        setAppointments(appointmentsRes.data);
-        setPayments(paymentsRes.data);
-        setAdmin(userRes.data);
-
-
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    // fetchData()
+      setPsychologists(psychologistsRes.data);
+      setTests(testsRes.data);
+      setEvaluations(evaluationsRes.data);
+      setAppointments(appointmentsRes.data);
+      setPayments(paymentsRes.data);
+      setAdmin(userRes.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+  // fetchData()
 
   const questionload = (testid) => {
     navigate("/addquestion?testid=" + testid);
-  }
+  };
 
   const handleChangeAdd = (e) => {
     setNewdata({ ...newdata, [e.target.name]: e.target.value });
   };
 
-  const handleAdd = (e)=>{
+  const handleAdd = (e) => {
     // e.preventDefault()
-    axios.post('http://localhost:5000/api/tests/',newdata)
-    setAdding(false)
-    navigate('/admindashboard') 
+    axios.post("http://localhost:5000/api/tests/", newdata);
+    setAdding(false);
+    navigate("/admindashboard");
     window.location.reload();
-  
-  }
+  };
 
   const deleteTest = (testid) => {
-    axios.delete(`http://localhost:5000/api/tests/${testid}`)
-    navigate('/admindashboard')
+    axios.delete(`http://localhost:5000/api/tests/${testid}`);
+    navigate("/admindashboard");
     window.location.reload();
-
-  }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/");
-  }
+  };
   const handleChange = (e) => {
     setAdmin({ ...admin, [e.target.name]: e.target.value });
   };
@@ -380,7 +436,10 @@ const filteredPayments = payments.filter((pay) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.put(`http://localhost:5000/api/admin/update-admin/${admin1.ADMIN_ID}`, admin);
+      const response = await axios.put(
+        `http://localhost:5000/api/admin/update-admin/${admin1.ADMIN_ID}`,
+        admin
+      );
       alert(response.data.message);
     } catch (error) {
       console.error("Error updating admin:", error);
@@ -388,12 +447,11 @@ const filteredPayments = payments.filter((pay) => {
     }
   };
 
-  const editTask = (task)=>{
+  const editTask = (task) => {
     console.log(task);
-    setEditing(true)
-    setUpdatedTask(task)
-    
-  }
+    setEditing(true);
+    setUpdatedTask(task);
+  };
   const handleChangeEdit = (e) => {
     setUpdatedTask({ ...updatedTask, [e.target.name]: e.target.value });
   };
@@ -402,7 +460,7 @@ const filteredPayments = payments.filter((pay) => {
     // e.preventDefault();
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/tests/update-task/${updatedTask.TEST_ID}`,  // API Endpoint
+        `http://localhost:5000/api/tests/update-task/${updatedTask.TEST_ID}`, // API Endpoint
         updatedTask
       );
 
@@ -417,7 +475,6 @@ const filteredPayments = payments.filter((pay) => {
       alert("Error updating task.");
     }
     window.location.reload();
-
   };
   const handleFilterChange = (e) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
@@ -425,11 +482,13 @@ const filteredPayments = payments.filter((pay) => {
 
   // Filtering logic
   const filteredEvaluations = evaluations.filter((evalItem) => {
-    const fullName = `${evalItem.first_name} ${evalItem.last_name}`.toLowerCase();
+    const fullName =
+      `${evalItem.first_name} ${evalItem.last_name}`.toLowerCase();
     const testName = evalItem.TEST_NAME.toLowerCase();
     const evaluationId = String(evalItem.TEST_EVALUATION_ID);
-    const [score, performance] = evalItem.TEST_EVALUATION.split(", Performance: ");
-    
+    const [score, performance] =
+      evalItem.TEST_EVALUATION.split(", Performance: ");
+
     return (
       evaluationId.includes(filters.evaluationId) &&
       fullName.includes(filters.candidateName.toLowerCase()) &&
@@ -445,21 +504,37 @@ const filteredPayments = payments.filter((pay) => {
       </header>
 
       <nav>
-        <a href="#manage-test" onClick={()=>setCard(true)}>Test Details</a>
-        <a href="#manage-appointment" onClick={()=>setCard(false)}>Appoiment Details</a>
-        <a href="#manage-doctors" onClick={()=>setCard(false)}>Doctors List</a>
-        <a href="#manage-evaluvation" onClick={()=>setCard(false)}>Evaluvation Details</a>
-        <a href="#manage-payments" onClick={()=>setCard(false)}>Payments</a>
-        <a href="#settings" onClick={()=>setCard(false)}>Profile</a>
+        <a href="#manage-test" onClick={() => setCard(true)}>
+          Test Details
+        </a>
+        <a href="#manage-appointment" onClick={() => setCard(false)}>
+          Appointment Details
+        </a>
+        <a href="#manage-doctors" onClick={() => setCard(false)}>
+          Psychologist List
+        </a>
+        <a href="#manage-evaluvation" onClick={() => setCard(false)}>
+          Test Reports
+        </a>
+        <a href="#manage-payments" onClick={() => setCard(false)}>
+          Payments
+        </a>
+        <a href="" onClick={handleLogout}>
+          Logout
+        </a>
       </nav>
 
       <div className="container1">
         {/* Order Section */}
         {card && (
-        <div className="section" id="manage-test">
-          
-        <h2>Manage Tests <button className="btn1" onClick={()=>setAdding(true)}>Add Test</button> </h2>
-          {/* <form action="">
+          <div className="section" id="manage-test">
+            <h2>
+              Manage Tests{" "}
+              <button className="btn1" onClick={() => setAdding(true)}>
+                Add Test
+              </button>{" "}
+            </h2>
+            {/* <form action="">
           <input
           type="text"
           placeholder="Search by Test Name or Description..."
@@ -471,276 +546,357 @@ const filteredPayments = payments.filter((pay) => {
         <button onClick={exportToExcel3} style={{border: "none", background: "none", color: "blue", cursor: "pointer",fontSize:"1em"}}>
           📥 Download Excel
         </button> */}
-        {adding && (
-          <>
-          <h3>Add Test</h3>
-          <form onSubmit={handleAdd}>
-        <input
-          type="text"
-          name="TEST_NAME"
-          value={newdata.TEST_NAME}
-          onChange={handleChangeAdd} 
-          placeholder="Enter  Test Name" // Allow input changes
-        />
-        <textarea
-          name="TEST_DESCRIPTION"
-          value={newdata.TEST_DESCRIPTION}
-          onChange={handleChangeAdd}  // Allow textarea changes
-          placeholder="Enter Description"
-        />
-        <button type="submit" className="btn1" style={{width:"100%"}}>Add</button> <br />
-        <button type="button" className="btn1" style={{marginTop:"10px"}} onClick={() => setAdding(false)}>Cancel</button>
-      </form>
-          </>
-        )}
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Test ID</th>
-              <th>Test Name</th>
-              <th>DESCRIPTION</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-          {filteredTests.map(test => (
-            <tr key={test.TEST_ID}>
-              <td>{test.TEST_ID}</td>
-              <td>{test.TEST_NAME}</td>
-              <td>{test.TEST_DESCRIPTION}</td>
-              <td id="tdbtn">
-                <button className="btn1" onClick={() => questionload(test.TEST_ID)}>Manage</button>
-                <button className="btn1" onClick={() => editTask(test)} >Edit</button>
-                <button className="btn1" onClick={() => deleteTest(test.TEST_ID)} >Delete</button>
-
-              </td>
-            </tr>
-
-          ))}
-
-          </tbody>
-        </table>
-        {editing && (
-          <>
-          <h3>Edit test</h3>
-          <form onSubmit={handleSubmitUpdate}>
-        <input
-          type="text"
-          name="TEST_NAME"
-          value={updatedTask.TEST_NAME}
-          onChange={handleChangeEdit}  // Allow input changes
-        />
-        <textarea
-          name="TEST_DESCRIPTION"
-          value={updatedTask.TEST_DESCRIPTION}
-          onChange={handleChangeEdit}  // Allow textarea changes
-        />
-        <button type="submit" className="btn1">Update</button> <br />
-        <button type="button" className="btn1" style={{marginTop:"10px"}} onClick={() => setEditing(false)}>Cancel</button>
-      </form>
-          </>
-        )}
-      </div>
-
-        )}
-
-        {/* Product Management Section */}
-        <div className="section" id="manage-appointment">
-          <h2>Appoiments</h2>
-          <input
-  type="text"
-  placeholder="Search by Appoiment ID..."
-  value={searchf1}
-  onChange={(e) => setSearchf1(e.target.value)}
-  className="search-input"
-/>
-          <input
-  type="text"
-  placeholder="Search by Candidate Name..."
-  value={searcha1}
-  onChange={(e) => setSearcha1(e.target.value)}
-  className="search-input"
-/>
-
-{/* <input
-  type="text"
-  placeholder="Search by Psychologist Name..."
-  value={searchb1}
-  onChange={(e) => setSearchb1(e.target.value)}
-  className="search-input"
-/> */}
-
-<input
-  type="text"
-  placeholder="Search by Test Name..."
-  value={searchc1}
-  onChange={(e) => setSearchc1(e.target.value)}
-  className="search-input"
-/>
-
-<input
-  type="text"
-  placeholder="Search by Score..."
-  value={searchd1}
-  onChange={(e) => setSearchd1(e.target.value)}
-  className="search-input"
-/>
-
-<input
-  type="text"
-  placeholder="Search by Performance..."
-  value={searche1}
-  onChange={(e) => setSearche1(e.target.value)}
-  className="search-input"
-/>
-<input
-  type="date"
-  value={fromDate1}
-  onChange={(e) => setFromDate1(e.target.value)}
-  className="search-input"
-/>
-
-{/* To Date Input */}
-<input
-  type="date"
-  value={toDate1}
-  onChange={(e) => setToDate1(e.target.value)}
-  className="search-input"
-/>
-<br />
-        <button onClick={exportToExcel1} style={{border: "none", background: "none", color: "blue", cursor: "pointer",fontSize:"1em"}}>
-          📥 Download Excel
-        </button>
-        <button onClick={downloadAppointmentsAsDocx}style={{border: "none", background: "none", color: "blue", cursor: "pointer",fontSize:"1em"}}>  📥 Download docx</button>
-          <table className="table">
-            <thead>
-              <tr>
-                        <th>ID</th>
-                        <th>Candidate Name</th>
-                        <th>Contact</th>
-                        <th>Email</th>
-                        <th>Psychologist Name</th>
-                        <th>Test Name</th>
-                        <th>Score</th>
-                        <th>Performance</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                      </tr>
-            </thead>
-            <tbody>
-              {filteredAppointments.map((appointment) => (
-                        <tr key={appointment.APPOINTMENT_ID}>
-                            <td>{appointment.APPOINTMENT_ID}</td>
-                            <td>{appointment.candidate_first_name} {appointment.candidate_last_name}</td>
-                            <td>{appointment.candidate_phone}</td>
-                            <td>{appointment.candidate_email}</td>
-                            <td>{appointment.psychologist_first_name} {appointment.psychologist_last_name}</td>
-                            <td>{appointment.TEST_NAME || "No Data"}</td>
-                            <td>{appointment.TEST_EVALUATION 
-                    ? appointment.TEST_EVALUATION.split(",")[0].replace("Score:", "").trim() 
-                    : "No Score"}</td>
-                            <td> {appointment.TEST_EVALUATION 
-                    ? appointment.TEST_EVALUATION.split(",")[1].replace("Performance:", "").trim() 
-                    : "No Performance"}</td>
-                            <td>{new Date(appointment.TIME_SLOT).toLocaleDateString()}</td>
-                            <td>{new Date(appointment.TIME_SLOT).toLocaleTimeString()}</td>
-                        </tr>
-                    ))}
-            </tbody>
-          </table>
-        </div>
-          <div className="section" id="manage-doctors">
-            <h2>Psychologist Details</h2>
-            {/* <form action="">
-            <input
-          type="text"
-          placeholder="Search by Name, DOB, Gender, Contact, Email, Certifications..."
-          value={search2}
-          onChange={(e) => setSearch2(e.target.value)}
-          className="search-input"
-        />
-        <button onClick={exportToExcel2} style={{border: "none", background: "none", color: "blue", cursor: "pointer",fontSize:"1em"}}>
-          📥 Download Excel
-        </button>
-            </form> */}
+            {adding && (
+              <>
+                <h3>Add Test</h3>
+                <form onSubmit={handleAdd}>
+                  <input
+                    type="text"
+                    name="TEST_NAME"
+                    value={newdata.TEST_NAME}
+                    onChange={handleChangeAdd}
+                    placeholder="Enter  Test Name" // Allow input changes
+                    required
+                  />
+                  <textarea
+                    name="TEST_DESCRIPTION"
+                    value={newdata.TEST_DESCRIPTION}
+                    onChange={handleChangeAdd} // Allow textarea changes
+                    placeholder="Enter Description"
+                    required
+                  />
+                  <button
+                    type="submit"
+                    className="btn1"
+                    style={{ width: "100%" }}
+                  >
+                    Add
+                  </button>{" "}
+                  <br />
+                  <button
+                    type="button"
+                    className="btn1"
+                    style={{ marginTop: "10px" }}
+                    onClick={() => setAdding(false)}
+                  >
+                    Cancel
+                  </button>
+                </form>
+              </>
+            )}
             <table className="table">
               <thead>
                 <tr>
-                <th>ID</th>
-                  <th>First Name</th>
-                  <th>Last Name</th>
-                  <th>DOB</th>
-                  <th>Gender</th>
-                  <th>Contact No</th>
-                  <th>Email</th>
-                  <th>Certifications</th>
+                  <th>Test ID</th>
+                  <th>Test Name</th>
+                  <th>DESCRIPTION</th>
+                  <th>CREATED</th>
+                  <th>UPDATED</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredPsychologists.map((psychologist) => (
-                  <tr key={psychologist.PSYCHOLOGIST_ID}>
-                    <td>{psychologist.PSYCHOLOGIST_ID}</td>
-                    <td>{psychologist.PSYCHOLOGIST_FIRST_NAME}</td>
-                    <td>{psychologist.PSYCHOLOGIST_LAST_NAME}</td>
-                    <td>{new Date(psychologist.PSYCHOLOGIST_DOB).toLocaleDateString()}</td>
-                    <td>{psychologist.PSYCHOLOGIST_GENDER}</td>
-                    <td>{psychologist.PSYCHOLOGIST_CONTACT_NO}</td>
-                    <td>{psychologist.PSYCHOLOGIST_EMAIL_ID}</td>
-                    <td>{psychologist.PSYCHOLOGIST_CERTIFICATIONS}</td>
+                {filteredTests.map((test) => (
+                  <tr key={test.TEST_ID}>
+                    <td>{test.TEST_ID}</td>
+                    <td>{test.TEST_NAME}</td>
+                    <td>{test.TEST_DESCRIPTION}</td>
+                    <td>{new Date(test.CREATED_AT).toLocaleDateString()}</td>
+                    <td>{new Date(test.UPDATED_AT).toLocaleDateString()}</td>
+
+                    {/* <td>{test.UPDATED_AT}</td> */}
+                    <td id="tdbtn">
+                      <button
+                        className="btn1"
+                        onClick={() => questionload(test.TEST_ID)}
+                      >
+                        Manage
+                      </button>
+                      <button className="btn1" onClick={() => editTask(test)}>
+                        Edit
+                      </button>
+                      <button
+                        className="btn1"
+                        onClick={() => deleteTest(test.TEST_ID)}
+                      >
+                        Delete
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            {editing && (
+              <>
+                <h3>Edit test</h3>
+                <form onSubmit={handleSubmitUpdate}>
+                  <input
+                    type="text"
+                    name="TEST_NAME"
+                    value={updatedTask.TEST_NAME}
+                    onChange={handleChangeEdit} // Allow input changes
+                  />
+                  <textarea
+                    name="TEST_DESCRIPTION"
+                    value={updatedTask.TEST_DESCRIPTION}
+                    onChange={handleChangeEdit} // Allow textarea changes
+                  />
+                  <button type="submit" className="btn1">
+                    Update
+                  </button>{" "}
+                  <br />
+                  <button
+                    type="button"
+                    className="btn1"
+                    style={{ marginTop: "10px" }}
+                    onClick={() => setEditing(false)}
+                  >
+                    Cancel
+                  </button>
+                </form>
+              </>
+            )}
           </div>
+        )}
+
+        {/* Product Management Section */}
+        <div className="section" id="manage-appointment">
+          <h2>Appointments</h2>
+          <input
+            type="text"
+            placeholder="Search by Appointment ID..."
+            value={searchf1}
+            onChange={(e) => setSearchf1(e.target.value)}
+            className="search-input"
+          />
+          <input
+            type="text"
+            placeholder="Search by Candidate Name..."
+            value={searcha1}
+            onChange={(e) => setSearcha1(e.target.value)}
+            className="search-input"
+          />
+
+          <input
+            type="text"
+            placeholder="Search by Test Name..."
+            value={searchc1}
+            onChange={(e) => setSearchc1(e.target.value)}
+            className="search-input"
+          />
+
+          <input
+            type="text"
+            placeholder="Search by Score..."
+            value={searchd1}
+            onChange={(e) => setSearchd1(e.target.value)}
+            className="search-input"
+          />
+
+          <input
+            type="text"
+            placeholder="Search by Performance..."
+            value={searche1}
+            onChange={(e) => setSearche1(e.target.value)}
+            className="search-input"
+          />
+          <input
+            type="date"
+            value={fromDate1}
+            onChange={(e) => setFromDate1(e.target.value)}
+            className="search-input"
+          />
+
+          {/* To Date Input */}
+          <input
+            type="date"
+            value={toDate1}
+            onChange={(e) => setToDate1(e.target.value)}
+            className="search-input"
+          />
+          <select name="" id="" onChange={(e) => setStatus(e.target.value)} className="search-input">
+            <option value="">all</option>
+            <option value="pending">Pending</option>
+            <option value="completed">Completed</option>
+          </select>
+          <br />
+          <button
+            onClick={exportToExcel1}
+            style={{
+              border: "none",
+              background: "none",
+              color: "blue",
+              cursor: "pointer",
+              fontSize: "1em",
+            }}
+          >
+            📥 Download Excel
+          </button>
+          <button
+            onClick={downloadAppointmentsAsDocx}
+            style={{
+              border: "none",
+              background: "none",
+              color: "blue",
+              cursor: "pointer",
+              fontSize: "1em",
+            }}
+          >
+            {" "}
+            📥 Download docx
+          </button>
+          <table className="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Candidate Name</th>
+                <th>Contact</th>
+                <th>Email</th>
+                <th>Psychologist Name</th>
+                <th>Test Name</th>
+                <th>Score</th>
+                <th>Performance</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>STATUS</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredAppointments.map((appointment) => (
+                <tr key={appointment.APPOINTMENT_ID}>
+                  <td>{appointment.APPOINTMENT_ID}</td>
+                  <td>
+                    {appointment.candidate_first_name}{" "}
+                    {appointment.candidate_last_name}
+                  </td>
+                  <td>{appointment.candidate_phone}</td>
+                  <td>{appointment.candidate_email}</td>
+                  <td>
+                    {appointment.psychologist_first_name}{" "}
+                    {appointment.psychologist_last_name}
+                  </td>
+                  <td>{appointment.TEST_NAME || "No Data"}</td>
+                  <td>
+                    {appointment.TEST_EVALUATION
+                      ? appointment.TEST_EVALUATION.split(",")[0]
+                          .replace("Score:", "")
+                          .trim()
+                      : "No Score"}
+                  </td>
+                  <td>
+                    {" "}
+                    {appointment.TEST_EVALUATION
+                      ? appointment.TEST_EVALUATION.split(",")[1]
+                          .replace("Performance:", "")
+                          .trim()
+                      : "No Performance"}
+                  </td>
+                  <td>
+                    {new Date(appointment.TIME_SLOT).toLocaleDateString()}
+                  </td>
+                  <td>
+                    {new Date(appointment.TIME_SLOT).toLocaleTimeString()}
+                  </td>
+                  <td>{appointment.STATUS}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="section" id="manage-doctors">
+          <h2>Psychologist Details</h2>
+
+          <table className="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>DOB</th>
+                <th>Gender</th>
+                <th>Contact No</th>
+                <th>Email</th>
+                <th>Certifications</th>
+              </tr>
+            </thead>
+            <tbody>
+              {psychologists.map((psychologist) => (
+                <tr key={psychologist.PSYCHOLOGIST_ID}>
+                  <td>{psychologist.PSYCHOLOGIST_ID}</td>
+                  <td>{psychologist.PSYCHOLOGIST_FIRST_NAME}</td>
+                  <td>{psychologist.PSYCHOLOGIST_LAST_NAME}</td>
+                  <td>
+                    {new Date(
+                      psychologist.PSYCHOLOGIST_DOB
+                    ).toLocaleDateString()}
+                  </td>
+                  <td>{psychologist.PSYCHOLOGIST_GENDER}</td>
+                  <td>{psychologist.PSYCHOLOGIST_CONTACT_NO}</td>
+                  <td>{psychologist.PSYCHOLOGIST_EMAIL_ID}</td>
+                  <td>{psychologist.PSYCHOLOGIST_CERTIFICATIONS}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         <div className="section" id="manage-evaluvation">
-          <h2>Evaluvation Details</h2>
+          <h2>Test Reports</h2>
           <div className="filter-container">
-        <input
-          type="text"
-          name="evaluationId"
-          placeholder="Filter by Evaluation ID"
-          value={filters.evaluationId}
-          onChange={handleFilterChange}
-          className="search-input"
-
-        />
-        <input
-          type="text"
-          name="candidateName"
-          placeholder="Filter by Candidate Name"
-          value={filters.candidateName}
-          onChange={handleFilterChange}
-          className="search-input"
-
-        />
-        <input
-          type="text"
-          name="testName"
-          placeholder="Filter by Test Name"
-          value={filters.testName}
-          onChange={handleFilterChange}
-          className="search-input"
-
-        />
-        <input
-          type="text"
-          name="score"
-          placeholder="Filter by Score"
-          value={filters.score}
-          onChange={handleFilterChange}
-          className="search-input"
-
-        />
-        <input
-          type="text"
-          name="performance"
-          placeholder="Filter by Performance"
-          value={filters.performance}
-          onChange={handleFilterChange}
-          className="search-input"
-
-        />
-      </div>
+            <input
+              type="text"
+              name="evaluationId"
+              placeholder="Filter by Evaluation ID"
+              value={filters.evaluationId}
+              onChange={handleFilterChange}
+              className="search-input"
+            />
+            <input
+              type="text"
+              name="candidateName"
+              placeholder="Filter by Candidate Name"
+              value={filters.candidateName}
+              onChange={handleFilterChange}
+              className="search-input"
+            />
+            <input
+              type="text"
+              name="testName"
+              placeholder="Filter by Test Name"
+              value={filters.testName}
+              onChange={handleFilterChange}
+              className="search-input"
+            />
+            <input
+              type="text"
+              name="score"
+              placeholder="Filter by Score"
+              value={filters.score}
+              onChange={handleFilterChange}
+              className="search-input"
+            />
+            <input
+              type="text"
+              name="performance"
+              placeholder="Filter by Performance"
+              value={filters.performance}
+              onChange={handleFilterChange}
+              className="search-input"
+            />
+            <input
+              type="date"
+              name="payFromDate"
+              value={filters.FromDate}
+              onChange={handleFilterChangepay}
+              className="search-input"
+            />
+            <input
+              type="date"
+              name="payToDate"
+              value={filters.ToDate}
+              onChange={handleFilterChangepay}
+              className="search-input"
+            />
+          </div>
           <table className="table">
             <thead>
               <tr>
@@ -749,28 +905,35 @@ const filteredPayments = payments.filter((pay) => {
                 <th>Test Name</th>
                 <th>Score</th>
                 <th>Performance</th>
+                <th>Date</th>
               </tr>
             </thead>
             <tbody>
-            {filteredEvaluations .length > 0 ? (
-              filteredEvaluations .map((evalItem) => {
-                // Splitting evaluation details
-                const [score, performance] = evalItem.TEST_EVALUATION.split(", Performance: ");
-                return (
-                  <tr key={evalItem.TEST_EVALUATION_ID}>
-                    <td>{evalItem.TEST_EVALUATION_ID}</td>
-                    <td>{evalItem.first_name} {evalItem.last_name}</td>
-                    <td>{evalItem.TEST_NAME}</td>
-                    <td>{score.replace("Score: ", "")}</td>
-                    <td>{performance}</td>
-                  </tr>
-                );
-              })
-            ) : (
-              <tr>
-                <td colSpan="5">No evaluations found.</td>
-              </tr>
-            )}
+              {filteredEvaluations.length > 0 ? (
+                filteredEvaluations.map((evalItem) => {
+                  // Splitting evaluation details
+                  const [score, performance] =
+                    evalItem.TEST_EVALUATION.split(", Performance: ");
+                  return (
+                    <tr key={evalItem.TEST_EVALUATION_ID}>
+                      <td>{evalItem.TEST_EVALUATION_ID}</td>
+                      <td>
+                        {evalItem.first_name} {evalItem.last_name}
+                      </td>
+                      <td>{evalItem.TEST_NAME}</td>
+                      <td>{score.replace("Score: ", "")}</td>
+                      <td>{performance}</td>
+                      <td>
+                        {new Date(evalItem.CREATED_AT).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan="6">No evaluations found.</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -778,75 +941,68 @@ const filteredPayments = payments.filter((pay) => {
         <div className="section" id="manage-payments">
           <h2>Payments Details</h2>
           <div className="filter-container">
-        <input
-          type="text"
-          name="id"
-          placeholder="Filter by ID"
-          value={payfilters.id}
-          onChange={handleFilterChangepay}
-          className="search-input"
-
-        />
-        <input
-          type="text"
-          name="candidate"
-          placeholder="Filter by Candidate"
-          value={payfilters.candidate}
-          onChange={handleFilterChangepay}
-          className="search-input"
-
-        />
-        <input
-          type="text"
-          name="appointmentId"
-          placeholder="Filter by Appointment ID"
-          value={payfilters.appointmentId}
-          onChange={handleFilterChangepay}
-          className="search-input"
-
-        />
-        <input
-          type="text"
-          name="paymentMethod"
-          placeholder="Filter by Payment Method"
-          value={payfilters.paymentMethod}
-          onChange={handleFilterChangepay}
-          className="search-input"
-
-        />
-        {/* <input
+            <input
+              type="text"
+              name="id"
+              placeholder="Filter by ID"
+              value={payfilters.id}
+              onChange={handleFilterChangepay}
+              className="search-input"
+            />
+            <input
+              type="text"
+              name="candidate"
+              placeholder="Filter by Candidate"
+              value={payfilters.candidate}
+              onChange={handleFilterChangepay}
+              className="search-input"
+            />
+            <input
+              type="text"
+              name="appointmentId"
+              placeholder="Filter by Appointment ID"
+              value={payfilters.appointmentId}
+              onChange={handleFilterChangepay}
+              className="search-input"
+            />
+            <input
+              type="text"
+              name="paymentMethod"
+              placeholder="Filter by Payment Method"
+              value={payfilters.paymentMethod}
+              onChange={handleFilterChangepay}
+              className="search-input"
+            />
+            {/* <input
           type="text"
           name="paymentAmount"
           placeholder="Filter by Payment Amount"
           value={payfilters.paymentAmount}
           onChange={handleFilterChangepay}
         /> */}
-        <input
-          type="date"
-          name="payFromDate"
-          value={payfilters.payFromDate}
-          onChange={handleFilterChangepay}
-          className="search-input"
+            <input
+              type="date"
+              name="payFromDate"
+              value={payfilters.payFromDate}
+              onChange={handleFilterChangepay}
+              className="search-input"
+            />
+            <input
+              type="date"
+              name="payToDate"
+              value={payfilters.payToDate}
+              onChange={handleFilterChangepay}
+              className="search-input"
+            />
+            <span style={{marginLeft: "10px"}}>Total Payments: {totalPayment}</span>
+          </div>
 
-        />
-        <input
-          type="date"
-          name="payToDate"
-          value={payfilters.payToDate}
-          onChange={handleFilterChangepay}
-          className="search-input"
-
-        />
-      </div>
-        {/* <button onClick={exportToExcel} className="" style={{border: "none", background: "none", color: "blue", cursor: "pointer",fontSize:"1em"}}>
-          📥 Download Excel
-        </button> */}
           <table className="table">
             <thead>
               <tr>
                 <th>ID</th>
                 <th>Candidate</th>
-                <th>Appoiment ID</th>
+                <th>Appointment ID</th>
                 <th>Payment Method</th>
                 <th>Payment Amount</th>
                 <th>Payment Date</th>
@@ -857,23 +1013,22 @@ const filteredPayments = payments.filter((pay) => {
               {filteredPayments.map((pay) => (
                 <tr key={pay.PAYMENT_ID}>
                   <td>{pay.PAYMENT_ID}</td>
-                  <td>{pay.first_name} {pay.name}</td>
+                  <td>
+                    {pay.first_name} {pay.name}
+                  </td>
                   <td>{pay.APPOINTMENT_ID}</td>
                   <td>{pay.PAYMENT_METHOD}</td>
                   <td>{pay.PAYMENT_AMOUNT}</td>
                   <td>{new Date(pay.PAYMENT_DATE).toLocaleDateString()}</td>
                   <td>{new Date(pay.PAYMENT_DATE).toLocaleTimeString()}</td>
-
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
 
-
-
         {/* Settings Section */}
-        <div className="section" id="settings">
+        {/* <div className="section" id="settings">
           <h2>Profile</h2>
           <p>Update your account settings, manage notifications, and customize the dashboard.</p>
           <button onClick={handleLogout} className="btn1">Logout</button>
@@ -925,7 +1080,7 @@ const filteredPayments = payments.filter((pay) => {
           Save Changes
         </button>
       </form>
-        </div>
+        </div> */}
       </div>
     </div>
   );

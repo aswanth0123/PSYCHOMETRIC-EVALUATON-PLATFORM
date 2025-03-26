@@ -31,10 +31,11 @@ const AddQuestion = () => {
       console.error("Error fetching questions:", error);
     }
     axios.get(`http://localhost:5000/api/tests/${testId}`).then((response) => {
-      setTestDetails(response.data);
+      setTestDetails(...response.data);
     });
   };
 
+  
   const filteredQuestions = questionsList.filter((q) => q.test_id == testId);
 
   const handleOptionChange = (index, value) => {
@@ -134,23 +135,17 @@ const AddQuestion = () => {
             // Title
             new Paragraph({
               children: [
-                new TextRun({ text: "EXAMPLE FOR TEST SET", bold: true, size: 32 }),
+                new TextRun({ text: testDetails.TEST_NAME , bold: true, size: 32 }),
               ],
               alignment: "center",
               spacing: { after: 300 },
             }),
-            // Test Name
-            new Paragraph({
-              children: [
-                new TextRun({ text: `Test Name: ${testDetails.name}`, bold: true, size: 24 }),
-              ],
-              spacing: { after: 200 },
-            }),
+
             // Test Details
             new Paragraph({
               children: [
                 new TextRun({
-                  text: `Test Details: ${testDetails.description}`,
+                  text: `Test Details: ${testDetails.TEST_DESCRIPTION}`,
                   size: 22,
                 }),
               ],
@@ -303,8 +298,8 @@ const AddQuestion = () => {
                       <td>
                         <button className="add-btn" onClick={() => handleEdit(q)}>
                           Edit
-                        </button> <br />
-                        <button className="add-btn" style={{ marginTop: "10px" }} onClick={() => deleteQuestion(q.id)}>
+                        </button> 
+                        <button className="add-btn" style={{ marginLeft: "10px" }} onClick={() => deleteQuestion(q.id)}>
                           Delete
                         </button>
                       </td>

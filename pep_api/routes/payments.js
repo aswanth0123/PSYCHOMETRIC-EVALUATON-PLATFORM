@@ -3,7 +3,7 @@ const router = express.Router();
 const Razorpay = require("razorpay");
 require("dotenv").config();
 const mysql = require("mysql2/promise"); // ✅ Using mysql2/promise
-
+const axios = require("axios");
 const db = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -100,5 +100,25 @@ router.post("/save-payment", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+router.get("/get-payment-method/:paymentId", async (req, res) => {
+  const paymentId = req.params.paymentId;
+  const razorpayKey = "rzp_test_MrmbaBWocQQF0J";
+  const razorpaySecret = process.env.RAZORPAY_KEY_SECRET; // Replace with your Razorpay Secret Key
+
+  try {
+      const auth = Buffer.from(`${razorpayKey}:${razorpaySecret}`).toString("base64");
+      const response = await axios.get(`https://api.razorpay.com/v1/payments/${paymentId}`, {
+          headers: { Authorization: `Basic ${auth}` },
+      });
+
+      return res.json({ method: response.data.method }); // Sends the payment method (UPI, Card, etc.)
+  } catch (error) {
+      console.error("Error fetching payment details:", error);
+      return res.status(500).json({ error: "Failed to retrieve payment method" });
+  }
+});
+
+
 
 module.exports = router;

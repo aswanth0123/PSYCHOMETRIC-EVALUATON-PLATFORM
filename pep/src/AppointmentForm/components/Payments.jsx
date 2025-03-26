@@ -33,7 +33,7 @@ const Checkout = () => {
             description: "Test Transaction",
             order_id: order.id,
             handler: async function (response) {
-                console.log("response", response);
+                console.log("response =fro==================================", response);
 
                 if (response) {
                     try {
@@ -49,8 +49,13 @@ const Checkout = () => {
                     }
                 }
 
-                // Save selected payment method
-                const paymentMethod = response.method || "Razorpay"; 
+                const paymentRes = await fetch(
+                    `http://localhost:5000/api/payments/get-payment-method/${response.razorpay_payment_id}`
+                );
+                const paymentData = await paymentRes.json();
+                console.log("paymentData", paymentData);
+                
+                const paymentMethod = paymentData.method;
 
                 await fetch("http://localhost:5000/api/payments/save-payment", {
                     method: "POST",
@@ -61,6 +66,7 @@ const Checkout = () => {
                         appointment_id: response1.data.APPOINTMENT_ID,
                         payment_method: paymentMethod, // 🔥 Dynamically set payment method
                         payment_amount: order.amount / 100,
+
                     }),
                 });
 

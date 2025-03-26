@@ -3,6 +3,26 @@
   height: 100vh;
 }
 
+.mark-completed{
+  background-color: #49ab6e;
+  border: none;
+  padding: 5px;
+  border-radius: 5px;
+}
+.mark-completed1 {
+  color: #49ab6e;
+  text-align: center;
+}
+.mark-completed2 {
+  background-image: linear-gradient( #4D76A5, #00234F);
+  color: #e4e4e4;
+  border: none;
+  padding: 5px;
+  border-radius: 5px;
+}
+.mark-completed:hover{
+  background-color: #0e9341;
+}
 .sidebar {
   width: 250px;
   background-image: linear-gradient( #4D76A5, #00234F);
@@ -227,4 +247,44 @@
 .appointments-banner p {
   font-size: 1rem;
   color: #ffffff;
+}
+
+.dashboard-overview1 {
+  display: grid;
+  justify-content: center; /* Center alignment */
+  gap: 20px;
+  grid-template-columns: auto auto auto;
+}
+
+.overview-card1 {
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.2s;
+  width: 250px; /* Card size */
+  margin: 0 auto; /* Ensure it stays centered */
+}
+
+.overview-card1:hover {
+  transform: translateY(-5px);
+}
+.table1{
+  margin-top: 20px;
+  border-collapse: collapse;
+  border: 1px solid #dfd1d1;
+  color:#555;
+
+  
+}
+.table1 th, .table1 td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ccc;
+}
+.table1 thead {
+  background-image: linear-gradient(#4D76A5, #00234F);
+  font-weight: bold;
+  color: white;
 }

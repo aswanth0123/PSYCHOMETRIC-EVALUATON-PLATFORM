@@ -14,6 +14,7 @@ const TestCard = ({ test }) => {
   return (
     <div className="test-card">
       <h3>{test.TEST_NAME}</h3>
+      <p>{test.TEST_DESCRIPTION}</p>
       <button onClick={() => startTest(test.TEST_ID)} className="test-btn">Start Test</button>
     </div>
   );

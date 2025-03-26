@@ -106,6 +106,7 @@ export default function AuthForm() {
     return (
         <div className="auth-container">
             <div className="form-container">
+            <h2 style={{color:"blue"}}>PHYCOLINC</h2>
                 <div className="form-toggle">
                     <button className={isLogin ? "active" : ""} onClick={() => setIsLogin(true)}>Login</button>
                     <button className={!isLogin ? "active" : ""} onClick={() => setIsLogin(false)}>SignUp</button>

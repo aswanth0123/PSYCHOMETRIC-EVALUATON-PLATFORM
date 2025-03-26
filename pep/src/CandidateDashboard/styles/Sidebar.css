@@ -4,6 +4,8 @@
     color: white;
     padding: 20px;
     height: 100vh;
+    position: fixed;
+
   }
   
   .logo {
@@ -95,3 +97,23 @@
     margin-right: 10px;
   }
   
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  /* Scrollbar track */
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+  
+  /* Scrollbar thumb */
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+  }
+  
+  /* Hover effect on thumb */
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
