@@ -12,6 +12,7 @@ import {
   TableRow,
   TableCell,
   TextRun,
+  ImageRun
 } from "docx";
 
 const AdminDashboard = () => {
@@ -209,12 +210,24 @@ const AdminDashboard = () => {
     saveAs(blob, "Appointments_Report.xlsx");
   };
 
-  const downloadAppointmentsAsDocx = () => {
+  const downloadAppointmentsAsDocx = async() => {
+    const logoBlob = await fetch(logo).then((res) => res.blob());
+    
     const doc = new Document({
       sections: [
         {
           properties: {},
           children: [
+                                        new Paragraph({
+                                          children: [
+                                            new ImageRun({
+                                              data: logoBlob,
+                                              transformation: { width: 120, height: 60 }, // Adjust logo size
+                                            }),
+                                          ],
+                                          alignment: "center",
+                                          spacing: { after: 300 },
+                                        }),
             new Paragraph({
               text: "Filtered Appointments",
               heading: "Title",
@@ -732,7 +745,7 @@ const AdminDashboard = () => {
           >
             📥 Download Excel
           </button>
-          <button
+          {/* <button
             onClick={downloadAppointmentsAsDocx}
             style={{
               border: "none",
@@ -744,7 +757,7 @@ const AdminDashboard = () => {
           >
             {" "}
             📥 Download docx
-          </button>
+          </button> */}
           <table className="table">
             <thead>
               <tr>

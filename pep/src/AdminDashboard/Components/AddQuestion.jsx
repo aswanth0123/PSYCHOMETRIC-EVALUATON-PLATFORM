@@ -3,7 +3,8 @@ import axios from "axios";
 import "./AddQuestion.css";
 import { useNavigate } from "react-router-dom";
 import { saveAs } from "file-saver";
-import { Document, Packer, Paragraph, TextRun } from "docx";
+import { Document, Packer, Paragraph, TextRun,ImageRun } from "docx";
+import logo from "../../assets/logo.png";
 const AddQuestion = () => {
   const currentTestId = window.location.href.split("testid=")[1];
   console.log(currentTestId);
@@ -126,13 +127,27 @@ const AddQuestion = () => {
     setEditMode(false);
     setEditQuestionId(null);
   };
-  const downloadAsDocx = () => {
+  const downloadAsDocx = async() => {
+    const logoBlob = await fetch(logo).then((res) => res.blob());
+    
     const doc = new Document({
       sections: [
         {
           properties: {},
           children: [
             // Title
+                            new Paragraph({
+                              children: [
+                                new ImageRun({
+                                  data: logoBlob,
+                                  transformation: { width: 120, height: 60 }, // Adjust logo size
+                                }),
+                              ],
+                              alignment: "center",
+                              spacing: { after: 300 },
+                            }),
+
+
             new Paragraph({
               children: [
                 new TextRun({ text: testDetails.TEST_NAME , bold: true, size: 32 }),
