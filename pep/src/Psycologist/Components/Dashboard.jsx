@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import axios from "axios";
 import TestCard from "./Testcard";
-import { Document, Packer, Paragraph, TextRun } from "docx";
-
+import { Document, Packer, Paragraph, TextRun,ImageRun } from "docx";
+import logo from "../../assets/logo.png";
 import {
   FaCheckCircle,
   FaClipboardList,
@@ -219,7 +219,7 @@ const P_Dashboard = () => {
       });
   };
 
-  const generateTestReport = (testData, ter) => {
+  const generateTestReport = async (testData, ter) => {
     if (!testData || testData.length === 0) {
       console.error("No test data available.");
       return;
@@ -238,14 +238,26 @@ const P_Dashboard = () => {
 
     // Format Date of Birth
     const dob = new Date(candidate.dob).toLocaleDateString();
+    const logoBlob = await fetch(logo).then((res) => res.blob());
 
     // Create Document Sections
     const doc = new Document({
+
       sections: [
         {
           properties: {},
           children: [
             // Candidate Information
+                            new Paragraph({
+                              children: [
+                                new ImageRun({
+                                  data: logoBlob,
+                                  transformation: { width: 120, height: 60 }, // Adjust logo size
+                                }),
+                              ],
+                              alignment: "center",
+                              spacing: { after: 300 },
+                            }),
             new Paragraph({
               text: `Test result of ${candidate.first_name} `,
               bold: true,
@@ -655,12 +667,17 @@ const P_Dashboard = () => {
                         )}
                       </th>
                       <th>
-                        <button style={{display:"block",margin:"auto"}}
-                          onClick={() => handleResult(item)}
-                          className="mark-completed2"
-                        >
-                          View Report
+                        {item.TEST_NAME ? (
+                             <button style={{display:"block",margin:"auto"}}
+                             onClick={() => handleResult(item)}
+                             className="mark-completed2"
+                           >                          View Report
                         </button>
+                        ) : (
+                          <p className="mark-completed1">No Report</p>
+                        )
+                        }
+
                       </th>
                     </tr>
                   ))

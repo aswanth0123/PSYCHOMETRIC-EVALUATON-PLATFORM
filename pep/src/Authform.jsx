@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for redirection
 import { Link } from "react-router-dom";
 import "./Authform.css"; // Import CSS file
-
+import logo from "./assets/logo.png"
 export default function AuthForm() {
     const [isLogin, setIsLogin] = useState(true); // Toggle between login & signup
     const [formData, setFormData] = useState({
