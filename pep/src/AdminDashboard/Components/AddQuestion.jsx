@@ -140,7 +140,7 @@ const AddQuestion = () => {
                               children: [
                                 new ImageRun({
                                   data: logoBlob,
-                                  transformation: { width: 120, height: 60 }, // Adjust logo size
+                                  transformation: { width: 100, height: 100 }, // Adjust logo size
                                 }),
                               ],
                               alignment: "center",

@@ -20,6 +20,7 @@ import Checkout from './AppointmentForm/components/Payments';
 import ForgetPassword from './ForgetPassword';
 import PsychologistForgetPassword from './PsyForget';
 import AdminForgetPassword from './AdminForget';
+import BlockAppointmentForm from './BlockAppointments/components/AppointmentForm';
 function App() {
   return (
     <Router>
@@ -45,6 +46,7 @@ function App() {
           <Route path="/forgetpassword" element={<ForgetPassword />} />
           <Route path="psychologistforgetpassword" element={<PsychologistForgetPassword />}/>
           <Route path="/AdminForgetPassword" element={<AdminForgetPassword/>} />
+          < Route path="blockapt" element= {<BlockAppointmentForm />} />
         </Routes>
       </div>
     </Router>

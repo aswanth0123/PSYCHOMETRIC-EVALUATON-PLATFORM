@@ -24,6 +24,8 @@ const Dashboard = () => {
   const [feedback, setFeedback] = useState([]); 
   const [review,setReview] = useState(null);
   const [editing, setEditing] = useState(false);
+  const [adding,setAdding] = useState(false)
+  const [newfeed,setNewfeed] = useState(null)
   const [filters, setFilters] = useState({
     evaluationId: "",
     candidateName: "",
@@ -226,13 +228,11 @@ const Dashboard = () => {
   }, [candidateId]);
   
   const handleAdd = async () => {
-    let a = prompt("Enter Your feedback");
-    if (!a) return; // Prevent empty feedback
-  
+
     try {
       await axios.post("http://localhost:5000/api/feedback/", {
         candidate_id: candidateId,
-        feedback: a
+        feedback: newfeed
       });
   
       // console.log("Feedback submitted successfully");
@@ -482,7 +482,7 @@ const Dashboard = () => {
 
             {filteredAppointments.length > 0 ? (
                     filteredAppointments.map((item) => (
-            <div className="overview-card1" style={{cursor:'pointer',height:'300px'}}>
+            <div className="overview-card1" style={{cursor:'pointer',height:'340px'}}>
                 <FaClipboardList className="overview-icon" />
                 <h3>{item.psychologist_first_name} {item.psychologist_last_name}</h3>
                 <p>Test Name :{item.TEST_NAME || "No Test Attended"} </p>
@@ -499,6 +499,7 @@ const Dashboard = () => {
                 <p><b>Date: {new Date(item.TIME_SLOT).toLocaleDateString()} </b></p>
                 <p><b>Time: {new Date(item.TIME_SLOT).toLocaleTimeString()} </b></p>
                 <p>Address: 123 Psychometric Tower, Chandkheda, Ahmedabad</p>
+                <p>Status : {item.STATUS}</p>
               </div>
                               ))
                             ) : (
@@ -653,8 +654,16 @@ const Dashboard = () => {
               <p>We value your thoughts! Please share your feedback.</p>
             </div>
             <div>
-              Add Feedback <button className="test-btn" onClick={handleAdd}>Click here</button>
+              Add Feedback <button className="test-btn" onClick={()=>setAdding(true)}>Click here</button>
             </div>
+            {adding &&(
+              <div>
+                <form action="">
+                  <input type="text" value={newfeed} onChange={(e) => setNewfeed(e.target.value)} />
+                  <button onClick={handleAdd} className="test-btn">Add</button>
+                </form>
+              </div>
+            )}
             {editing &&(
               <div>
                 <form action="">

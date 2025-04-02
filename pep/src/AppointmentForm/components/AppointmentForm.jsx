@@ -119,6 +119,8 @@ const AppointmentForm = () => {
     console.log("appointmentData", sessionStorage.getItem("appointmentData"));
 
     setTimeout(() => {
+      sessionStorage.removeItem("quiz");
+      sessionStorage.removeItem("testEvaluationId");
       navigate("/payment");
     }, 1000);
 

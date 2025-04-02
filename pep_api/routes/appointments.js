@@ -7,7 +7,7 @@ const createTableQuery = `
     CREATE TABLE IF NOT EXISTS appointments_table (
         APPOINTMENT_ID INT AUTO_INCREMENT PRIMARY KEY,
         PSYCHOLOGIST_ID INT NOT NULL,
-        CANDIDATE_ID INT NOT NULL,
+        CANDIDATE_ID INT DEFAULT NULL,
         TEST_ID INT DEFAULT NULL,
         TEST_EVALUATION_ID INT DEFAULT NULL,
         STATUS VARCHAR(50) DEFAULT NULL,
@@ -34,13 +34,48 @@ router.post("/", (req, res) => {
     // }
     console.log(TEST_ID, TEST_EVALUATION_ID);
     
-    if (TEST_ID  === null || TEST_EVALUATION_ID === null) {
+    if (TEST_ID  === null || TEST_EVALUATION_ID === null ){ 
             const sql = `
-            INSERT INTO appointments_table (PSYCHOLOGIST_ID, CANDIDATE_ID, TIME_SLOT, STATUS)
+            INSERT INTO appointments_table (PSYCHOLOGIST_ID,CANDIDATE_ID, TIME_SLOT, STATUS)
             VALUES (?, ?, ?, ?)
         `;
 
-        db.query(sql, [PSYCHOLOGIST_ID, CANDIDATE_ID, TIME_SLOT, STATUS], (err, result) => {
+        db.query(sql, [PSYCHOLOGIST_ID,CANDIDATE_ID,TIME_SLOT, STATUS], (err, result) => {
+            if (err) {
+                console.error("Error inserting appointment:", err);
+                return res.status(500).json({ error: "Database error while inserting appointment." });
+            }
+            res.status(201).json({ message: "Appointment successfully created!", APPOINTMENT_ID: result.insertId });
+        });
+    }
+    else{
+        const sql = `
+            INSERT INTO appointments_table (PSYCHOLOGIST_ID, CANDIDATE_ID, TEST_ID, TEST_EVALUATION_ID, TIME_SLOT, STATUS)
+            VALUES (?, ?, ?, ?, ?, ?)
+        `;
+
+        db.query(sql, [PSYCHOLOGIST_ID, CANDIDATE_ID, TEST_ID, TEST_EVALUATION_ID, TIME_SLOT, STATUS], (err, result) => {
+            if (err) {
+                console.error("Error inserting appointment:", err);
+                return res.status(500).json({ error: "Database error while inserting appointment." });
+            }
+            res.status(201).json({ message: "Appointment successfully created!", APPOINTMENT_ID: result.insertId });
+        });
+    }
+
+
+});
+router.post("/block", (req, res) => {
+    const { PSYCHOLOGIST_ID, CANDIDATE_ID, TEST_ID, TEST_EVALUATION_ID, TIME_SLOT, STATUS } = req.body
+    console.log(TEST_ID, TEST_EVALUATION_ID);
+    
+    if (TEST_ID  === null || TEST_EVALUATION_ID === null || CANDIDATE_ID === null){ 
+            const sql = `
+            INSERT INTO appointments_table (PSYCHOLOGIST_ID, TIME_SLOT, STATUS)
+            VALUES (?, ?, ?)
+        `;
+
+        db.query(sql, [PSYCHOLOGIST_ID, TIME_SLOT, STATUS], (err, result) => {
             if (err) {
                 console.error("Error inserting appointment:", err);
                 return res.status(500).json({ error: "Database error while inserting appointment." });

@@ -20,6 +20,15 @@ app.use("/api/psychologist", psychologistRoutes);
 const testRoutes = require("./routes/testRoutes");
 app.use("/api/tests", testRoutes);
 
+const questionsRoutes = require("./routes/questions");
+app.use("/api/questions", questionsRoutes);
+
+const quizRouter = require("./routes/quizRoutes");
+app.use("/api/quiz", quizRouter);
+
+const questionResult = require("./routes/questionResult");
+app.use("/api/questionResult", questionResult);
+
 const testEvaluationRoutes = require("./routes/testEvaluationRoutes");
 app.use("/api/test-evaluations", testEvaluationRoutes);
 
@@ -29,17 +38,8 @@ app.use("/api/appointments", appointmentsRoutes);
 const paymentsRoutes = require("./routes/payments");
 app.use("/api/payments", paymentsRoutes);
 
-const questionsRoutes = require("./routes/questions");
-app.use("/api/questions", questionsRoutes);
-
 const feedbackRoutes = require("./routes/feedback");
 app.use("/api/feedback", feedbackRoutes);
-
-const quizRouter = require("./routes/quizRoutes");
-app.use("/api/quiz", quizRouter);
-
-const questionResult = require("./routes/questionResult");
-app.use("/api/questionResult", questionResult);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

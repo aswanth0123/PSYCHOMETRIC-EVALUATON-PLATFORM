@@ -50,13 +50,16 @@
 /* Date and Time Selection */
 .date-container,
 .time-container {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    /* flex-wrap: wrap; */
+    grid-template-columns: auto auto auto;
     justify-content: center;
     gap: 10px;
-    margin: 10px 0;
+    /* margin: 10px 0; */
 }
-
+.time-container{
+    grid-template-columns:auto auto auto auto auto ;
+}
 .date-box,
 .time-box {
     padding: 10px;

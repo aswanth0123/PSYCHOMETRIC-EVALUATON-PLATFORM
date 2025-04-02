@@ -18,15 +18,25 @@ const LandingPage = () => {
         .catch(error => {
             console.error('Error fetching tests:', error);
         });
-
         axios.get('http://localhost:5000/api/feedback')
         .then(response => {
-            const latestFeedback = response.data
-            setFeedback(latestFeedback.reverse());
+            let feedbackList = response.data;
+            
+            // Shuffle the array using Fisher-Yates algorithm
+            for (let i = feedbackList.length - 1; i > 0; i--) {
+                let j = Math.floor(Math.random() * (i + 1));
+                [feedbackList[i], feedbackList[j]] = [feedbackList[j], feedbackList[i]];
+            }
+    
+            // Get the first 6 random feedbacks
+            const randomFeedback = feedbackList.slice(0, 6);
+            
+            setFeedback(randomFeedback);
         })
         .catch(error => {
             logger.error('Error fetching feedback:', error);
-        })
+        });
+    
         
     },[])
     // console.log(feedback);
@@ -42,7 +52,7 @@ const LandingPage = () => {
             {/* Header Section */}
             <header className="header">
                 <nav className="nav">
-                    <div className="logo">PHYCOLINC</div>
+                    <div className="logo"><a href="../">PHYCOLINC</a></div>
                     <div className="nav-links">
                         <a href="#overview">Home</a>
                         <a href="#benefits">Benefits</a>

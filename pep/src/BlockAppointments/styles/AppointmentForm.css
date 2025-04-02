@@ -1,0 +1,123 @@
+/* Main Container */
+.appointment-body {
+    background: linear-gradient(#4D76A5, #00234F);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.appointment-container {
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.9); /* Light transparent background */
+    border-radius: 12px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    color: black;
+}
+
+/* Psychologist Info */
+.psychologist-info {
+    padding: 10px;
+    background: #007bff;
+    color: white;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.psychologist-info h2 {
+    margin: 5px 0;
+}
+
+.psychologist-info p {
+    font-size: 14px;
+}
+
+/* Input Field */
+.appointment-form input {
+    width: 90%;
+    padding: 10px;
+    margin: 10px 0;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+/* Date and Time Selection */
+.date-container,
+.time-container {
+    display: grid;
+    /* flex-wrap: wrap; */
+    grid-template-columns: auto auto auto;
+    justify-content: center;
+    gap: 10px;
+    margin: 10px 0;
+}
+.time-container{
+    grid-template-columns:auto auto auto auto auto ;
+}
+.date-box,
+.time-box {
+    padding: 10px;
+    border: none;
+    background: linear-gradient(#f8f9fa, #d4e3fc);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.date-box:hover,
+.time-box:hover,
+.selected {
+    background: linear-gradient(#4D76A5, #00234F) !important;
+    color: white;
+    font-weight: bold;
+}
+
+/* Submit Button */
+.submit-btn {
+    margin-top: 15px;
+    padding: 10px;
+    width: 100%;
+    background: linear-gradient(to right, #4D76A5, #00234F);
+    color: white;
+    font-size: 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.submit-btn:hover {
+    background: linear-gradient(to right, #00234F, #4D76A5);
+    transform: scale(1.02);
+}
+
+.back-btn {
+    margin-top: 15px;
+    padding: 10px;
+    width: 100%;
+    background: linear-gradient(to right, #4D76A5, #00234F);
+    color: white;
+    font-size: 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.back-btn:hover {
+    background: linear-gradient(to right, #00234F, #4D76A5);
+    transform: scale(1.02);
+}
+
+/* Confirmation Message */
+.confirmation-message {
+    color: green;
+    font-weight: bold;
+    margin-top: 15px;
+}

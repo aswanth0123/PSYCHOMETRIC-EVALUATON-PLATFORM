@@ -4,6 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import logo from '../../assets/logo.png'
 import {
   Document,
   Packer,
@@ -12,7 +13,8 @@ import {
   TableRow,
   TableCell,
   TextRun,
-  ImageRun
+  ImageRun,
+  WidthType 
 } from "docx";
 
 const AdminDashboard = () => {
@@ -222,7 +224,7 @@ const AdminDashboard = () => {
                                           children: [
                                             new ImageRun({
                                               data: logoBlob,
-                                              transformation: { width: 120, height: 60 }, // Adjust logo size
+                                              transformation: { width: 100, height: 100 }, // Adjust logo size
                                             }),
                                           ],
                                           alignment: "center",
@@ -510,6 +512,155 @@ const AdminDashboard = () => {
       performance.toLowerCase().includes(filters.performance.toLowerCase())
     );
   });
+  const downloadReportAsDocx = async() => {
+    const logoBlob = await fetch(logo).then((res) => res.blob());
+
+    const doc = new Document({
+      sections: [
+        {
+          children: [
+            new Paragraph({
+              children: [
+                new ImageRun({
+                  data: logoBlob,
+                  transformation: { width: 100, height: 100 }, // Adjust logo size
+                }),
+              ],
+              alignment: "center",
+              spacing: { after: 300 },
+            }),
+            new Paragraph({
+              text: "Evaluation Report",
+              heading: "Title",
+              spacing: { after: 200 },
+            }),
+            new Table({
+              width: { size: 100, type: WidthType.PERCENTAGE },
+              rows: [
+                // Table header
+                new TableRow({
+                  children: [
+                    "Candidate Name",
+                    "Test Name",
+                    "Score",
+                    "Performance",
+                    "Date",
+                  ].map((header) =>
+                    new TableCell({
+                      children: [new Paragraph(header)],
+                    })
+                  ),
+                }),
+                // Table rows
+                ...filteredEvaluations.map((evalItem) => {
+                  const [score, performance] = evalItem.TEST_EVALUATION.split(", Performance: ");
+                  return new TableRow({
+                    children: [
+                      // new TableCell({ children: [new Paragraph(evalItem.TEST_EVALUATION_ID)] }),
+                      new TableCell({
+                        children: [new Paragraph(`${evalItem.first_name} ${evalItem.last_name}`)],
+                      }),
+                      new TableCell({ children: [new Paragraph(evalItem.TEST_NAME)] }),
+                      new TableCell({ children: [new Paragraph(score.replace("Score: ", ""))] }),
+                      new TableCell({ children: [new Paragraph(performance)] }),
+                      new TableCell({
+                        children: [
+                          new Paragraph(new Date(evalItem.CREATED_AT).toLocaleDateString()),
+                        ],
+                      }),
+                    ],
+                  });
+                }),
+              ],
+            }),
+          ],
+        },
+      ],
+    });
+  
+    Packer.toBlob(doc).then((blob) => {
+      saveAs(blob, "Evaluation_Report.docx");
+    });
+  };
+
+  const downloadPaymentAsDocx = async() => {
+    const logoBlob = await fetch(logo).then((res) => res.blob());
+
+    const doc = new Document({
+      sections: [
+        {
+          children: [
+            new Paragraph({
+              children: [
+                new ImageRun({
+                  data: logoBlob,
+                  transformation: { width: 100, height: 100 }, // Adjust logo size
+                }),
+              ],
+              alignment: "center",
+              spacing: { after: 300 },
+            }),
+            new Paragraph({
+              text: "Payment Report",
+              heading: "Title",
+              spacing: { after: 200 },
+            }),
+            new Table({
+              width: { size: 100, type: WidthType.PERCENTAGE },
+              rows: [
+                // Table header
+                new TableRow({
+                  children: [
+                    "ID",
+                    "Candidate",
+                    "Appointment ID",
+                    "Payment Method",
+                    "Payment Amount",
+                    "Payment Date",
+                    "Payment Time",
+                  ].map((header) =>
+                    new TableCell({
+                      children: [new Paragraph(header)],
+                    })
+                  ),
+                }),
+                // Table rows
+                ...filteredPayments.map((pay) => {
+                  return new TableRow({
+                    children: [
+                      new TableCell({ children: [new Paragraph(pay.PAYMENT_ID.toString())] }),
+                      new TableCell({
+                        children: [new Paragraph(`${pay.first_name} ${pay.name}`)],
+                      }),
+                      new TableCell({ children: [new Paragraph(pay.APPOINTMENT_ID.toString())] }),
+                      new TableCell({ children: [new Paragraph(pay.PAYMENT_METHOD)] }),
+                      new TableCell({ children: [new Paragraph(pay.PAYMENT_AMOUNT.toString())] }),
+                      new TableCell({
+                        children: [
+                          new Paragraph(new Date(pay.PAYMENT_DATE).toLocaleDateString()),
+                        ],
+                      }),
+                      new TableCell({
+                        children: [
+                          new Paragraph(new Date(pay.PAYMENT_DATE).toLocaleTimeString()),
+                        ],
+                      }),
+                    ],
+                  });
+                }),
+              ],
+            }),
+          ],
+        },
+      ],
+    });
+  
+    Packer.toBlob(doc).then((blob) => {
+      saveAs(blob, "Payment_Report.docx");
+    });
+  };
+
+
   return (
     <div>
       <header>
@@ -532,6 +683,7 @@ const AdminDashboard = () => {
         <a href="#manage-payments" onClick={() => setCard(false)}>
           Payments
         </a>
+        <a href="./blockapt" onClick={() => setCard(false)}>Block Bookings</a>
         <a href="" onClick={handleLogout}>
           Logout
         </a>
@@ -745,7 +897,7 @@ const AdminDashboard = () => {
           >
             📥 Download Excel
           </button>
-          {/* <button
+          <button
             onClick={downloadAppointmentsAsDocx}
             style={{
               border: "none",
@@ -757,7 +909,7 @@ const AdminDashboard = () => {
           >
             {" "}
             📥 Download docx
-          </button> */}
+          </button>
           <table className="table">
             <thead>
               <tr>
@@ -779,11 +931,11 @@ const AdminDashboard = () => {
                 <tr key={appointment.APPOINTMENT_ID}>
                   <td>{appointment.APPOINTMENT_ID}</td>
                   <td>
-                    {appointment.candidate_first_name}{" "}
+                    {appointment.candidate_first_name || "Admin Blocked Booking"}{" "}
                     {appointment.candidate_last_name}
                   </td>
-                  <td>{appointment.candidate_phone}</td>
-                  <td>{appointment.candidate_email}</td>
+                  <td>{appointment.candidate_phone || "No Contact"}</td>
+                  <td>{appointment.candidate_email || "No Email"}</td>
                   <td>
                     {appointment.psychologist_first_name}{" "}
                     {appointment.psychologist_last_name}
@@ -909,6 +1061,19 @@ const AdminDashboard = () => {
               onChange={handleFilterChangepay}
               className="search-input"
             />
+                    <button
+            onClick={downloadReportAsDocx}
+            style={{
+              border: "none",
+              background: "none",
+              color: "blue",
+              cursor: "pointer",
+              fontSize: "1em",
+            }}
+          >
+            {" "}
+            📥 Download docx
+          </button>
           </div>
           <table className="table">
             <thead>
@@ -1008,6 +1173,20 @@ const AdminDashboard = () => {
               className="search-input"
             />
             <span style={{marginLeft: "10px"}}>Total Payments: {totalPayment}</span>
+
+            <button
+            onClick={downloadPaymentAsDocx}
+            style={{
+              border: "none",
+              background: "none",
+              color: "blue",
+              cursor: "pointer",
+              fontSize: "1em",
+            }}
+          >
+            {" "}
+            📥 Download docx
+          </button>
           </div>
 
           <table className="table">
@@ -1041,8 +1220,8 @@ const AdminDashboard = () => {
         </div>
 
         {/* Settings Section */}
-        {/* <div className="section" id="settings">
-          <h2>Profile</h2>
+        <div className="section" id="settings">
+          <h2>Block slots </h2>
           <p>Update your account settings, manage notifications, and customize the dashboard.</p>
           <button onClick={handleLogout} className="btn1">Logout</button>
 
@@ -1093,7 +1272,7 @@ const AdminDashboard = () => {
           Save Changes
         </button>
       </form>
-        </div> */}
+        </div>
       </div>
     </div>
   );
