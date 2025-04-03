@@ -44,6 +44,7 @@ const Sidebar = ({ setActiveSection }) => {
           <FaCommentDots className="sidebar-icon" />
           <span>Feedback</span>
         </li>
+        
         <li onClick={() => setActiveSection("settings")}>
           <span>Profile</span>
         </li>

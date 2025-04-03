@@ -156,7 +156,7 @@ const P_Dashboard = () => {
         ),
       ]);
 
-      setAppoiments(appointments.data);
+      setAppoiments(appointments.data.filter((item) => item.STATUS !== "blocked"));
       setResult(evaluations.data);
 
       setTestsData(tests.data);
@@ -382,9 +382,11 @@ const P_Dashboard = () => {
     const itemDate = formatDate(item.TIME_SLOT);
     const testEvaluation = item.TEST_EVALUATION || ""; // Ensure it's always a string
     const data = item.TEST_NAME || "";
+    const candidateName = item.candidate_first_name ? item.candidate_first_name.toLowerCase() : ""; // Prevent null error
+
 
     return (
-      item.candidate_first_name.toLowerCase().includes(aptfilters.candidateName.toLowerCase()) &&
+      candidateName.includes(aptfilters.candidateName.toLowerCase()) &&
       data.toLowerCase().includes(aptfilters.testName.toLowerCase()) &&
       (aptfilters.score === "" || testEvaluation.includes(`Score: ${aptfilters.score}`)) &&
       (aptfilters.performance === "" || testEvaluation.includes(`Performance: ${aptfilters.performance}`)) &&
@@ -458,7 +460,7 @@ const P_Dashboard = () => {
               <h1>📋 My Tests</h1>
               <p>Explore and take tests to understand yourself better.</p>
             </div>
-            <div className="card-list">
+            <div className="card-list" style={{ display: "grid", gridTemplateColumns: "auto auto auto auto auto", gap: "20px" }}>
               {testsData.map((test) => (
                 <TestCard key={test.id} test={test} />
               ))}
@@ -634,10 +636,11 @@ const P_Dashboard = () => {
               <tbody>
                 {filteredAppointments.length > 0 ? (
                   filteredAppointments.map((item) => (
+                  
                     <tr key={item.APPOINTMENT_ID}>
                       <th>{item.APPOINTMENT_ID}</th>
 
-                      <th>{item.candidate_first_name}</th>
+                      <th>{item.candidate_first_name ? item.candidate_first_name : "Admin Blocked Appointment"}</th>
                       <th>{item.TEST_NAME ? item.TEST_NAME : "No Test"}</th>
                       <th>
                         {item.TEST_EVALUATION
@@ -658,17 +661,18 @@ const P_Dashboard = () => {
                       <th>{new Date(item.TIME_SLOT).toLocaleTimeString()}</th>
                       <th>{item.STATUS}</th>
                       <th>
-                        {item.STATUS == "pending" ? (
+                        {item.STATUS === "pending" ? (
                           <button
-                          style={{display:"block",margin:"auto"}}
+                            style={{ display: "block", margin: "auto" }}
                             onClick={() => handleAccept(item.APPOINTMENT_ID)}
                             className="mark-completed"
                           >
-                            mark as completed
+                            Mark as Completed
                           </button>
                         ) : (
                           <p className="mark-completed1">Completed</p>
-                        )}
+                        )
+                      }
                       </th>
                       <th>
                         {item.TEST_NAME ? (
@@ -869,6 +873,8 @@ const P_Dashboard = () => {
                     name="PSYCHOLOGIST_CONTACT_NO"
                     value={user.PSYCHOLOGIST_CONTACT_NO}
                     onChange={handleChange}
+                    minLength={10}
+                    maxLength={10}
                     className="w-full p-2 border rounded"
                   />
                 </div>

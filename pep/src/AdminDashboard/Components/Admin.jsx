@@ -334,28 +334,6 @@ const AdminDashboard = () => {
 
   
 
-  // Function to export data to Excel
-  const exportToExcel2 = () => {
-    const ws = XLSX.utils.json_to_sheet(
-      filteredPsychologists.map((psychologist) => ({
-        ID: psychologist.PSYCHOLOGIST_ID,
-        First_Name: psychologist.PSYCHOLOGIST_FIRST_NAME,
-        Last_Name: psychologist.PSYCHOLOGIST_LAST_NAME,
-        DOB: formatDate(psychologist.PSYCHOLOGIST_DOB),
-        Gender: psychologist.PSYCHOLOGIST_GENDER,
-        Contact_No: psychologist.PSYCHOLOGIST_CONTACT_NO,
-        Email: psychologist.PSYCHOLOGIST_EMAIL_ID,
-        Certifications: psychologist.PSYCHOLOGIST_CERTIFICATIONS,
-      }))
-    );
-
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Psychologists");
-    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-    const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
-
-    saveAs(blob, "Psychologists_Report.xlsx");
-  };
 
   // Filter Tests based on search input
   const filteredTests = tests.filter((test) => {
@@ -365,23 +343,7 @@ const AdminDashboard = () => {
     );
   });
 
-  // Export Filtered Data to Excel
-  const exportToExcel3 = () => {
-    const ws = XLSX.utils.json_to_sheet(
-      filteredTests.map((test) => ({
-        Test_ID: test.TEST_ID,
-        Test_Name: test.TEST_NAME,
-        Description: test.TEST_DESCRIPTION,
-      }))
-    );
 
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Tests");
-    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-    const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
-
-    saveAs(blob, "Tests_Report.xlsx");
-  };
 
   const navigate = useNavigate();
 
@@ -659,8 +621,54 @@ const AdminDashboard = () => {
       saveAs(blob, "Payment_Report.docx");
     });
   };
-
-
+  const exportToExcel2 = () => {
+    const worksheet = XLSX.utils.json_to_sheet(filteredPayments.map((pay) => ({
+      ID: pay.PAYMENT_ID,
+      Candidate: `${pay.first_name} ${pay.name}`,
+      "Appointment ID": pay.APPOINTMENT_ID,
+      "Payment Method": pay.PAYMENT_METHOD,
+      "Payment Amount": pay.PAYMENT_AMOUNT,
+      "Payment Date": new Date(pay.PAYMENT_DATE).toLocaleDateString(),
+      "Payment Time": new Date(pay.PAYMENT_DATE).toLocaleTimeString(),
+    })));
+  
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Payments");
+  
+    // Create a binary Excel file and trigger download
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const data = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+  
+    saveAs(data, "payments.xlsx");
+  };
+  const exportToExcel3 = () => {
+    if (!filteredEvaluations || filteredEvaluations.length === 0) {
+      alert("No evaluations available to download.");
+      return;
+    }
+  
+    const data = filteredEvaluations.map((evalItem) => {
+      const [score, performance] = evalItem.TEST_EVALUATION.split(", Performance: ");
+      return {
+        "Evaluation ID": evalItem.TEST_EVALUATION_ID,
+        "Candidate Name": `${evalItem.first_name} ${evalItem.last_name}`,
+        "Test Name": evalItem.TEST_NAME,
+        Score: score.replace("Score: ", ""),
+        Performance: performance,
+        Date: new Date(evalItem.CREATED_AT).toLocaleDateString(),
+      };
+    });
+  
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Evaluations");
+  
+    // Generate Excel file and trigger download
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const blob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+  
+    saveAs(blob, "evaluations.xlsx");
+  };
   return (
     <div>
       <header>
@@ -684,6 +692,14 @@ const AdminDashboard = () => {
           Payments
         </a>
         <a href="./blockapt" onClick={() => setCard(false)}>Block Bookings</a>
+        <a href="" onClick={(e)=>{
+          e.preventDefault()
+          console.log('btn pressed');
+          
+          downloadAppointmentsAsDocx()
+          downloadReportAsDocx()
+          downloadPaymentAsDocx()
+        }}>Download All report</a>
         <a href="" onClick={handleLogout}>
           Logout
         </a>
@@ -699,18 +715,7 @@ const AdminDashboard = () => {
                 Add Test
               </button>{" "}
             </h2>
-            {/* <form action="">
-          <input
-          type="text"
-          placeholder="Search by Test Name or Description..."
-          value={search3}
-          onChange={(e) => setSearch3(e.target.value)}
-          className="search-input"
-        />
-          </form>
-        <button onClick={exportToExcel3} style={{border: "none", background: "none", color: "blue", cursor: "pointer",fontSize:"1em"}}>
-          📥 Download Excel
-        </button> */}
+
             {adding && (
               <>
                 <h3>Add Test</h3>
@@ -883,6 +888,7 @@ const AdminDashboard = () => {
             <option value="">all</option>
             <option value="pending">Pending</option>
             <option value="completed">Completed</option>
+            <option value="blocked">Blocked</option>
           </select>
           <br />
           <button
@@ -1061,6 +1067,18 @@ const AdminDashboard = () => {
               onChange={handleFilterChangepay}
               className="search-input"
             />
+            <button
+            onClick={exportToExcel3}
+            style={{
+              border: "none",
+              background: "none",
+              color: "blue",
+              cursor: "pointer",
+              fontSize: "1em",
+            }}
+          >
+            📥 Download Excel
+          </button>
                     <button
             onClick={downloadReportAsDocx}
             style={{
@@ -1173,7 +1191,18 @@ const AdminDashboard = () => {
               className="search-input"
             />
             <span style={{marginLeft: "10px"}}>Total Payments: {totalPayment}</span>
-
+            <button
+            onClick={exportToExcel2}
+            style={{
+              border: "none",
+              background: "none",
+              color: "blue",
+              cursor: "pointer",
+              fontSize: "1em",
+            }}
+          >
+            📥 Download Excel
+          </button>
             <button
             onClick={downloadPaymentAsDocx}
             style={{
