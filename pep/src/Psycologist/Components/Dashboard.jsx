@@ -242,84 +242,147 @@ const P_Dashboard = () => {
 
     // Create Document Sections
     const doc = new Document({
-
       sections: [
         {
           properties: {},
           children: [
-            // Candidate Information
-                            new Paragraph({
-                              children: [
-                                new ImageRun({
-                                  data: logoBlob,
-                                  transformation: { width: 100, height: 100 }, // Adjust logo size
-                                }),
-                              ],
-                              alignment: "center",
-                              spacing: { after: 300 },
-                            }),
+            // Logo
             new Paragraph({
-              text: `Test result of ${candidate.first_name} `,
-              bold: true,
-              size: 32,
+              children: [
+                new ImageRun({
+                  data: logoBlob,
+                  transformation: { width: 100, height: 100 },
+                }),
+              ],
               alignment: "center",
+              spacing: { after: 300 },
+            }),
+    
+            // Title
+            new Paragraph({
+              alignment: "center",
+              children: [
+                new TextRun({
+                  text: `Test result of ${candidate.first_name}`,
+                  bold: true,
+                  size: 42,
+                }),
+              ],
+            }),
+    
+            // Candidate Info
+            new Paragraph({
+              children: [
+                new TextRun({ text: `First Name: ${candidate.first_name}`, bold: true, size: 22 }),
+              ],
             }),
             new Paragraph({
-              text: `First Name: ${candidate.first_name}`,
-              size: 22,
+              children: [
+                new TextRun({ text: `Last Name: ${candidate.last_name}`, bold: true, size: 22 }),
+              ],
             }),
             new Paragraph({
-              text: `Last Name: ${candidate.last_name}`,
-              size: 22,
+              children: [
+                new TextRun({ text: `DOB: ${dob}`, size: 22 }),
+              ],
             }),
-            new Paragraph({ text: `DOB: ${dob}`, size: 22 }),
-            new Paragraph({ text: `Gender: ${candidate.gender}`, size: 22 }),
             new Paragraph({
-              text: `Contact No.: ${candidate.contact_number}`,
-              size: 22,
+              children: [
+                new TextRun({ text: `Gender: ${candidate.gender}`, size: 22 }),
+              ],
             }),
-            new Paragraph({ text: `Email Id: ${candidate.email}`, size: 22 }),
+            new Paragraph({
+              children: [
+                new TextRun({ text: `Contact No.: ${candidate.contact_number}`, bold: true, size: 22 }),
+              ],
+            }),
+            new Paragraph({
+              children: [
+                new TextRun({ text: `Email Id: ${candidate.email}`, bold: true, size: 22 }),
+              ],
+            }),
+    
             new Paragraph({ text: "", spacing: { after: 200 } }),
-
-            // Test Evaluation
-            new Paragraph({ text: "Test Evaluation:", bold: true, size: 24 }),
-            new Paragraph({ text: `- Score: ${score}`, size: 22 }),
-            new Paragraph({ text: `- Performance: ${performance}`, size: 22 }),
-            new Paragraph({ text: "", spacing: { after: 200 } }),
-
-            // Test Details
+    
+            // Evaluation
             new Paragraph({
-              text: `Test Name: ${candidate.TEST_NAME}`,
-              bold: true,
-              size: 24,
+              children: [
+                new TextRun({ text: "Test Evaluation:", bold: true, size: 24 }),
+              ],
             }),
             new Paragraph({
-              text: `Test Details: ${candidate.TEST_DESCRIPTION}`,
-              size: 22,
+              children: [
+                new TextRun({ text: `- Score: ${score}`, size: 22 }),
+              ],
             }),
+            new Paragraph({
+              children: [
+                new TextRun({ text: `- Performance: ${performance}`, size: 22 }),
+              ],
+            }),
+    
             new Paragraph({ text: "", spacing: { after: 200 } }),
-
-            // Test Questions and Responses
-            new Paragraph({ text: "Test Set:", bold: true, size: 24 }),
+    
+            // Test Info
+            new Paragraph({
+              children: [
+                new TextRun({ text: `Test Name: ${candidate.TEST_NAME}`, bold: true, size: 26 }),
+              ],
+            }),
+            new Paragraph({
+              children: [
+                new TextRun({ text: `Test Details: ${candidate.TEST_DESCRIPTION}`, size: 22 }),
+              ],
+            }),
+    
+            new Paragraph({ text: "", spacing: { after: 200 } }),
+    
+            // Questions and Answers
+            new Paragraph({
+              children: [
+                new TextRun({ text: "Test Set:", bold: true, size: 24 }),
+              ],
+            }),
+    
             ...testData
               .map((q, index) => [
                 new Paragraph({
-                  text: `${index + 1}. ${q.question_text}`,
-                  bold: true,
-                  size: 22,
-                }),
-                new Paragraph({ text: `A) ${q.option_a}`, size: 20 }),
-                new Paragraph({ text: `B) ${q.option_b}`, size: 20 }),
-                new Paragraph({ text: `C) ${q.option_c}`, size: 20 }),
-                new Paragraph({ text: `D) ${q.option_d}`, size: 20 }),
-                new Paragraph({
-                  text: `Suitable Option: ${q.correct_option}`,
-                  bold: true,
-                  size: 22,
+                  children: [
+                    new TextRun({
+                      text: `${index + 1}. ${q.question_text}`,
+                      bold: true,
+                      size: 22,
+                    }),
+                  ],
                 }),
                 new Paragraph({
-                  text: `Selected Option: ${q.SELECTED_OPTION}`,
-                  size: 22,
+                  children: [new TextRun({ text: `A) ${q.option_a}`, size: 20 })],
+                }),
+                new Paragraph({
+                  children: [new TextRun({ text: `B) ${q.option_b}`, size: 20 })],
+                }),
+                new Paragraph({
+                  children: [new TextRun({ text: `C) ${q.option_c}`, size: 20 })],
+                }),
+                new Paragraph({
+                  children: [new TextRun({ text: `D) ${q.option_d}`, size: 20 })],
+                }),
+                new Paragraph({
+                  children: [
+                    new TextRun({
+                      text: `Suitable Option: ${q.correct_option}`,
+                      bold: true,
+                      size: 22,
+                    }),
+                  ],
+                }),
+                new Paragraph({
+                  children: [
+                    new TextRun({
+                      text: `Selected Option: ${q.SELECTED_OPTION}`,
+                      size: 22,
+                    }),
+                  ],
                 }),
                 new Paragraph({ text: "", spacing: { after: 150 } }),
               ])
@@ -328,15 +391,14 @@ const P_Dashboard = () => {
         },
       ],
     });
-
-    // Save the Document as a File
+    
+    // Save document
     Packer.toBlob(doc).then((blob) => {
       saveAs(blob, `Test_Report_${candidate.first_name}.docx`);
     });
-
+    
     console.log("Test Report generated successfully.");
-  };
-
+  };    
   const handleResult = (apt) => {
     const test_data = result.find(
       (test) => test.TEST_EVALUATION_ID === apt.TEST_EVALUATION_ID
@@ -460,7 +522,7 @@ const P_Dashboard = () => {
               <h1>📋 My Tests</h1>
               <p>Explore and take tests to understand yourself better.</p>
             </div>
-            <div className="card-list" style={{ display: "grid", gridTemplateColumns: "auto auto auto auto auto", gap: "20px" }}>
+            <div className="card-list" style={{ display: "grid", gridTemplateColumns: "auto auto auto", gap: "20px" }}>
               {testsData.map((test) => (
                 <TestCard key={test.id} test={test} />
               ))}

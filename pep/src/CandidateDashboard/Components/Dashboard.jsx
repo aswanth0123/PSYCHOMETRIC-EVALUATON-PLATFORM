@@ -356,7 +356,7 @@ const Dashboard = () => {
               <h1>📋 My Tests</h1>
               <p>Explore and take tests to understand yourself better.</p>
             </div>
-            <div className="card-list" style={{ display: "grid", gridTemplateColumns: "auto auto auto auto auto", gap: "20px" }}>
+            <div className="card-list" style={{ display: "grid", gridTemplateColumns: "auto auto auto", gap: "20px" ,justifyContent: "center" }}>
               {testsData.map((test) => (
                 <TestCard key={test.id} test={test} />
               ))}

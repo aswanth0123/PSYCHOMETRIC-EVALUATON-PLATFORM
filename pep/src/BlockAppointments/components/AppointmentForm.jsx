@@ -182,7 +182,7 @@ const BlockAppointmentForm = () => {
 
         {/* Submit Button */}
         <button type="submit" className="submit-btn">
-          Book Appointment
+          Block Appointment
         </button>
       </form>
 

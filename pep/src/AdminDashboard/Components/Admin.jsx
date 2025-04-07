@@ -4,7 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import logo from '../../assets/logo.png'
+import logo from "../../assets/logo.png";
 import {
   Document,
   Packer,
@@ -14,7 +14,7 @@ import {
   TableCell,
   TextRun,
   ImageRun,
-  WidthType 
+  WidthType,
 } from "docx";
 
 const AdminDashboard = () => {
@@ -103,7 +103,7 @@ const AdminDashboard = () => {
   });
   const totalPayment = filteredPayments.reduce((total, pay) => {
     return total + parseFloat(pay.PAYMENT_AMOUNT || 0); // Convert to float & handle null values
-  }, 0); 
+  }, 0);
   // console.log(admin,'admin');
   // Function to format the date as MM/DD/YYYY
   const formatDate = (date) => {
@@ -180,8 +180,8 @@ const AdminDashboard = () => {
         extractPerformance(appointment.TEST_EVALUATION)
           .toLowerCase()
           .includes(searche1.toLowerCase())) &&
-        (status === "all" || appointment.STATUS.toLowerCase().includes(status.toLowerCase())) &&
-
+      (status === "all" ||
+        appointment.STATUS.toLowerCase().includes(status.toLowerCase())) &&
       (!from || appointmentDate >= from) && // Check if appointment is on or after the from date
       (!to || appointmentDate <= to)
     );
@@ -212,24 +212,24 @@ const AdminDashboard = () => {
     saveAs(blob, "Appointments_Report.xlsx");
   };
 
-  const downloadAppointmentsAsDocx = async() => {
+  const downloadAppointmentsAsDocx = async () => {
     const logoBlob = await fetch(logo).then((res) => res.blob());
-    
+
     const doc = new Document({
       sections: [
         {
           properties: {},
           children: [
-                                        new Paragraph({
-                                          children: [
-                                            new ImageRun({
-                                              data: logoBlob,
-                                              transformation: { width: 100, height: 100 }, // Adjust logo size
-                                            }),
-                                          ],
-                                          alignment: "center",
-                                          spacing: { after: 300 },
-                                        }),
+            new Paragraph({
+              children: [
+                new ImageRun({
+                  data: logoBlob,
+                  transformation: { width: 100, height: 100 }, // Adjust logo size
+                }),
+              ],
+              alignment: "center",
+              spacing: { after: 300 },
+            }),
             new Paragraph({
               text: "Filtered Appointments",
               heading: "Title",
@@ -239,19 +239,111 @@ const AdminDashboard = () => {
                 // Table Header Row
                 new TableRow({
                   children: [
-                    new TableCell({ children: [new Paragraph("ID")] }),
                     new TableCell({
-                      children: [new Paragraph("Candidate Name")],
+                      children: [
+                        new Paragraph({
+                          children: [
+                            new TextRun({
+                              text: "ID",
+                              bold: true,
+                              size: 24, // 12pt
+                            }),
+                          ],
+                        }),
+                      ],
                     }),
                     new TableCell({
-                      children: [new Paragraph("Psychologist")],
+                      children: [
+                        new Paragraph({
+                          children: [
+                            new TextRun({
+                              text: "Candidate Name",
+                              bold: true,
+                              size: 24,
+                            }),
+                          ],
+                        }),
+                      ],
                     }),
-                    new TableCell({ children: [new Paragraph("Test Name")] }),
-                    new TableCell({ children: [new Paragraph("Score")] }),
-                    new TableCell({ children: [new Paragraph("Performance")] }),
-                    new TableCell({ children: [new Paragraph("Date")] }),
-                    new TableCell({ children: [new Paragraph("Time")] }),
-                  ],
+                    new TableCell({
+                      children: [
+                        new Paragraph({
+                          children: [
+                            new TextRun({
+                              text: "Psychologist",
+                              bold: true,
+                              size: 24,
+                            }),
+                          ],
+                        }),
+                      ],
+                    }),
+                    new TableCell({
+                      children: [
+                        new Paragraph({
+                          children: [
+                            new TextRun({
+                              text: "Test Name",
+                              bold: true,
+                              size: 24,
+                            }),
+                          ],
+                        }),
+                      ],
+                    }),
+                    new TableCell({
+                      children: [
+                        new Paragraph({
+                          children: [
+                            new TextRun({
+                              text: "Score",
+                              bold: true,
+                              size: 24,
+                            }),
+                          ],
+                        }),
+                      ],
+                    }),
+                    new TableCell({
+                      children: [
+                        new Paragraph({
+                          children: [
+                            new TextRun({
+                              text: "Performance",
+                              bold: true,
+                              size: 24,
+                            }),
+                          ],
+                        }),
+                      ],
+                    }),
+                    new TableCell({
+                      children: [
+                        new Paragraph({
+                          children: [
+                            new TextRun({
+                              text: "Date",
+                              bold: true,
+                              size: 24,
+                            }),
+                          ],
+                        }),
+                      ],
+                    }),
+                    new TableCell({
+                      children: [
+                        new Paragraph({
+                          children: [
+                            new TextRun({
+                              text: "Time",
+                              bold: true,
+                              size: 24,
+                            }),
+                          ],
+                        }),
+                      ],
+                    }),
+                  ],                  
                 }),
                 // Table Data Rows
                 ...filteredAppointments.map(
@@ -332,9 +424,6 @@ const AdminDashboard = () => {
     });
   };
 
-  
-
-
   // Filter Tests based on search input
   const filteredTests = tests.filter((test) => {
     return (
@@ -342,8 +431,6 @@ const AdminDashboard = () => {
       test.TEST_DESCRIPTION.toLowerCase().includes(search3.toLowerCase())
     );
   });
-
-
 
   const navigate = useNavigate();
 
@@ -474,9 +561,92 @@ const AdminDashboard = () => {
       performance.toLowerCase().includes(filters.performance.toLowerCase())
     );
   });
-  const downloadReportAsDocx = async() => {
+  const downloadReportAsDocx = async () => {
     const logoBlob = await fetch(logo).then((res) => res.blob());
+    const appointmentEvaluations = filteredEvaluations.filter((item) =>
+      appointments.some((appt) => appt.TEST_EVALUATION_ID === item.TEST_EVALUATION_ID)
+    );
+    // const appointmentEvaluations = filteredEvaluations.filter(
+    //   (item) => item.APPOINTMENT_ID !== null
+    // );
 
+    const testOnlyEvaluations = filteredEvaluations.filter(
+      (item) =>
+        !appointments.some(
+          (appt) => appt.TEST_EVALUATION_ID === item.TEST_EVALUATION_ID
+        )
+    );
+    
+  
+    const createTable = (data, title) => [
+      new Paragraph({
+        text: title,
+        heading: "Heading1",
+        alignment: "center",
+        spacing: { after: 200 },
+      }),
+      new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        rows: [
+          new TableRow({
+            children: [
+              "Candidate Name",
+              "Test Name",
+              "Score",
+              "Performance",
+              "Date",
+            ].map((header) =>
+              new TableCell({
+                children: [
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: header,
+                        bold: true,
+                        size: 24, // 12pt font size
+                      }),
+                    ],
+                  }),
+                ],
+              })
+            ),
+          }),
+          ...data.map((evalItem) => {
+            const [score, performance] =
+              evalItem.TEST_EVALUATION.split(", Performance: ");
+            return new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph(
+                      `${evalItem.first_name} ${evalItem.last_name}`
+                    ),
+                  ],
+                }),
+                new TableCell({
+                  children: [new Paragraph(evalItem.TEST_NAME)],
+                }),
+                new TableCell({
+                  children: [new Paragraph(score.replace("Score: ", ""))],
+                }),
+                new TableCell({
+                  children: [new Paragraph(performance)],
+                }),
+                new TableCell({
+                  children: [
+                    new Paragraph(
+                      new Date(evalItem.CREATED_AT).toLocaleDateString()
+                    ),
+                  ],
+                }),
+              ],
+            });
+          }),
+        ],
+      }),
+      new Paragraph({ text: "", spacing: { after: 300 } }), // Spacing between tables
+    ];
+  
     const doc = new Document({
       sections: [
         {
@@ -485,7 +655,7 @@ const AdminDashboard = () => {
               children: [
                 new ImageRun({
                   data: logoBlob,
-                  transformation: { width: 100, height: 100 }, // Adjust logo size
+                  transformation: { width: 100, height: 100 },
                 }),
               ],
               alignment: "center",
@@ -494,47 +664,10 @@ const AdminDashboard = () => {
             new Paragraph({
               text: "Evaluation Report",
               heading: "Title",
-              spacing: { after: 200 },
+              spacing: { after: 400 },
             }),
-            new Table({
-              width: { size: 100, type: WidthType.PERCENTAGE },
-              rows: [
-                // Table header
-                new TableRow({
-                  children: [
-                    "Candidate Name",
-                    "Test Name",
-                    "Score",
-                    "Performance",
-                    "Date",
-                  ].map((header) =>
-                    new TableCell({
-                      children: [new Paragraph(header)],
-                    })
-                  ),
-                }),
-                // Table rows
-                ...filteredEvaluations.map((evalItem) => {
-                  const [score, performance] = evalItem.TEST_EVALUATION.split(", Performance: ");
-                  return new TableRow({
-                    children: [
-                      // new TableCell({ children: [new Paragraph(evalItem.TEST_EVALUATION_ID)] }),
-                      new TableCell({
-                        children: [new Paragraph(`${evalItem.first_name} ${evalItem.last_name}`)],
-                      }),
-                      new TableCell({ children: [new Paragraph(evalItem.TEST_NAME)] }),
-                      new TableCell({ children: [new Paragraph(score.replace("Score: ", ""))] }),
-                      new TableCell({ children: [new Paragraph(performance)] }),
-                      new TableCell({
-                        children: [
-                          new Paragraph(new Date(evalItem.CREATED_AT).toLocaleDateString()),
-                        ],
-                      }),
-                    ],
-                  });
-                }),
-              ],
-            }),
+            ...createTable(appointmentEvaluations, "Appointed Evaluation Reports"),
+            ...createTable(testOnlyEvaluations, "Test Attended Reports Only"),
           ],
         },
       ],
@@ -544,8 +677,9 @@ const AdminDashboard = () => {
       saveAs(blob, "Evaluation_Report.docx");
     });
   };
+  
 
-  const downloadPaymentAsDocx = async() => {
+  const downloadPaymentAsDocx = async () => {
     const logoBlob = await fetch(logo).then((res) => res.blob());
 
     const doc = new Document({
@@ -580,31 +714,60 @@ const AdminDashboard = () => {
                     "Payment Amount",
                     "Payment Date",
                     "Payment Time",
-                  ].map((header) =>
-                    new TableCell({
-                      children: [new Paragraph(header)],
-                    })
+                  ].map(
+                    (header) =>
+                      new TableCell({
+                        children: [
+                          new Paragraph({
+                            children: [
+                              new TextRun({
+                                text: header,
+                                bold: true,
+                                size: 24, // Font size in half-points (24 = 12pt)
+                              }),
+                            ],
+                          }),
+                        ],
+                      })
                   ),
                 }),
                 // Table rows
                 ...filteredPayments.map((pay) => {
                   return new TableRow({
                     children: [
-                      new TableCell({ children: [new Paragraph(pay.PAYMENT_ID.toString())] }),
                       new TableCell({
-                        children: [new Paragraph(`${pay.first_name} ${pay.name}`)],
+                        children: [new Paragraph(pay.PAYMENT_ID.toString())],
                       }),
-                      new TableCell({ children: [new Paragraph(pay.APPOINTMENT_ID.toString())] }),
-                      new TableCell({ children: [new Paragraph(pay.PAYMENT_METHOD)] }),
-                      new TableCell({ children: [new Paragraph(pay.PAYMENT_AMOUNT.toString())] }),
                       new TableCell({
                         children: [
-                          new Paragraph(new Date(pay.PAYMENT_DATE).toLocaleDateString()),
+                          new Paragraph(`${pay.first_name} ${pay.name}`),
                         ],
                       }),
                       new TableCell({
                         children: [
-                          new Paragraph(new Date(pay.PAYMENT_DATE).toLocaleTimeString()),
+                          new Paragraph(pay.APPOINTMENT_ID.toString()),
+                        ],
+                      }),
+                      new TableCell({
+                        children: [new Paragraph(pay.PAYMENT_METHOD)],
+                      }),
+                      new TableCell({
+                        children: [
+                          new Paragraph(pay.PAYMENT_AMOUNT.toString()),
+                        ],
+                      }),
+                      new TableCell({
+                        children: [
+                          new Paragraph(
+                            new Date(pay.PAYMENT_DATE).toLocaleDateString()
+                          ),
+                        ],
+                      }),
+                      new TableCell({
+                        children: [
+                          new Paragraph(
+                            new Date(pay.PAYMENT_DATE).toLocaleTimeString()
+                          ),
                         ],
                       }),
                     ],
@@ -616,29 +779,36 @@ const AdminDashboard = () => {
         },
       ],
     });
-  
+
     Packer.toBlob(doc).then((blob) => {
       saveAs(blob, "Payment_Report.docx");
     });
   };
   const exportToExcel2 = () => {
-    const worksheet = XLSX.utils.json_to_sheet(filteredPayments.map((pay) => ({
-      ID: pay.PAYMENT_ID,
-      Candidate: `${pay.first_name} ${pay.name}`,
-      "Appointment ID": pay.APPOINTMENT_ID,
-      "Payment Method": pay.PAYMENT_METHOD,
-      "Payment Amount": pay.PAYMENT_AMOUNT,
-      "Payment Date": new Date(pay.PAYMENT_DATE).toLocaleDateString(),
-      "Payment Time": new Date(pay.PAYMENT_DATE).toLocaleTimeString(),
-    })));
-  
+    const worksheet = XLSX.utils.json_to_sheet(
+      filteredPayments.map((pay) => ({
+        ID: pay.PAYMENT_ID,
+        Candidate: `${pay.first_name} ${pay.name}`,
+        "Appointment ID": pay.APPOINTMENT_ID,
+        "Payment Method": pay.PAYMENT_METHOD,
+        "Payment Amount": pay.PAYMENT_AMOUNT,
+        "Payment Date": new Date(pay.PAYMENT_DATE).toLocaleDateString(),
+        "Payment Time": new Date(pay.PAYMENT_DATE).toLocaleTimeString(),
+      }))
+    );
+
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Payments");
-  
+
     // Create a binary Excel file and trigger download
-    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-    const data = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-  
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const data = new Blob([excelBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
     saveAs(data, "payments.xlsx");
   };
   const exportToExcel3 = () => {
@@ -647,28 +817,60 @@ const AdminDashboard = () => {
       return;
     }
   
-    const data = filteredEvaluations.map((evalItem) => {
-      const [score, performance] = evalItem.TEST_EVALUATION.split(", Performance: ");
-      return {
-        "Evaluation ID": evalItem.TEST_EVALUATION_ID,
-        "Candidate Name": `${evalItem.first_name} ${evalItem.last_name}`,
-        "Test Name": evalItem.TEST_NAME,
-        Score: score.replace("Score: ", ""),
-        Performance: performance,
-        Date: new Date(evalItem.CREATED_AT).toLocaleDateString(),
-      };
-    });
+    // Filter data
+    const appointmentEvaluations = filteredEvaluations.filter((item) =>
+      appointments.some(
+        (appt) => appt.TEST_EVALUATION_ID === item.TEST_EVALUATION_ID
+      )
+    );
   
-    const worksheet = XLSX.utils.json_to_sheet(data);
+    const testOnlyEvaluations = filteredEvaluations.filter(
+      (item) =>
+        !appointments.some(
+          (appt) => appt.TEST_EVALUATION_ID === item.TEST_EVALUATION_ID
+        )
+    );
+  
+    // Convert to worksheet format
+    const formatData = (list) =>
+      list.map((evalItem) => {
+        const [score, performance] =
+          evalItem.TEST_EVALUATION.split(", Performance: ");
+        return {
+          "Evaluation ID": evalItem.TEST_EVALUATION_ID,
+          "Candidate Name": `${evalItem.first_name} ${evalItem.last_name}`,
+          "Test Name": evalItem.TEST_NAME,
+          Score: score.replace("Score: ", ""),
+          Performance: performance,
+          Date: new Date(evalItem.CREATED_AT).toLocaleDateString(),
+        };
+      });
+  
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Evaluations");
+  
+    // Add sheets
+    const appointmentSheet = XLSX.utils.json_to_sheet(
+      formatData(appointmentEvaluations)
+    );
+    XLSX.utils.book_append_sheet(workbook, appointmentSheet, "Appointments");
+  
+    const testOnlySheet = XLSX.utils.json_to_sheet(
+      formatData(testOnlyEvaluations)
+    );
+    XLSX.utils.book_append_sheet(workbook, testOnlySheet, "Test Only");
   
     // Generate Excel file and trigger download
-    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-    const blob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const blob = new Blob([excelBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
   
-    saveAs(blob, "evaluations.xlsx");
+    saveAs(blob, "Evaluation_Report.xlsx");
   };
+  
   return (
     <div>
       <header>
@@ -691,15 +893,22 @@ const AdminDashboard = () => {
         <a href="#manage-payments" onClick={() => setCard(false)}>
           Payments
         </a>
-        <a href="./blockapt" onClick={() => setCard(false)}>Block Bookings</a>
-        <a href="" onClick={(e)=>{
-          e.preventDefault()
-          console.log('btn pressed');
-          
-          downloadAppointmentsAsDocx()
-          downloadReportAsDocx()
-          downloadPaymentAsDocx()
-        }}>Download All report</a>
+        <a href="./blockapt" onClick={() => setCard(false)}>
+          Block Bookings
+        </a>
+        <a
+          href=""
+          onClick={(e) => {
+            e.preventDefault();
+            console.log("btn pressed");
+
+            downloadAppointmentsAsDocx();
+            downloadReportAsDocx();
+            downloadPaymentAsDocx();
+          }}
+        >
+          Download All report
+        </a>
         <a href="" onClick={handleLogout}>
           Logout
         </a>
@@ -884,7 +1093,12 @@ const AdminDashboard = () => {
             onChange={(e) => setToDate1(e.target.value)}
             className="search-input"
           />
-          <select name="" id="" onChange={(e) => setStatus(e.target.value)} className="search-input">
+          <select
+            name=""
+            id=""
+            onChange={(e) => setStatus(e.target.value)}
+            className="search-input"
+          >
             <option value="">all</option>
             <option value="pending">Pending</option>
             <option value="completed">Completed</option>
@@ -937,7 +1151,8 @@ const AdminDashboard = () => {
                 <tr key={appointment.APPOINTMENT_ID}>
                   <td>{appointment.APPOINTMENT_ID}</td>
                   <td>
-                    {appointment.candidate_first_name || "Admin Blocked Booking"}{" "}
+                    {appointment.candidate_first_name ||
+                      "Admin Blocked Booking"}{" "}
                     {appointment.candidate_last_name}
                   </td>
                   <td>{appointment.candidate_phone || "No Contact"}</td>
@@ -1068,30 +1283,30 @@ const AdminDashboard = () => {
               className="search-input"
             />
             <button
-            onClick={exportToExcel3}
-            style={{
-              border: "none",
-              background: "none",
-              color: "blue",
-              cursor: "pointer",
-              fontSize: "1em",
-            }}
-          >
-            📥 Download Excel
-          </button>
-                    <button
-            onClick={downloadReportAsDocx}
-            style={{
-              border: "none",
-              background: "none",
-              color: "blue",
-              cursor: "pointer",
-              fontSize: "1em",
-            }}
-          >
-            {" "}
-            📥 Download docx
-          </button>
+              onClick={exportToExcel3}
+              style={{
+                border: "none",
+                background: "none",
+                color: "blue",
+                cursor: "pointer",
+                fontSize: "1em",
+              }}
+            >
+              📥 Download Excel
+            </button>
+            <button
+              onClick={downloadReportAsDocx}
+              style={{
+                border: "none",
+                background: "none",
+                color: "blue",
+                cursor: "pointer",
+                fontSize: "1em",
+              }}
+            >
+              {" "}
+              📥 Download docx
+            </button>
           </div>
           <table className="table">
             <thead>
@@ -1190,32 +1405,34 @@ const AdminDashboard = () => {
               onChange={handleFilterChangepay}
               className="search-input"
             />
-            <span style={{marginLeft: "10px"}}>Total Payments: {totalPayment}</span>
+            <span style={{ marginLeft: "10px" }}>
+              Total Payments: {totalPayment}
+            </span>
             <button
-            onClick={exportToExcel2}
-            style={{
-              border: "none",
-              background: "none",
-              color: "blue",
-              cursor: "pointer",
-              fontSize: "1em",
-            }}
-          >
-            📥 Download Excel
-          </button>
+              onClick={exportToExcel2}
+              style={{
+                border: "none",
+                background: "none",
+                color: "blue",
+                cursor: "pointer",
+                fontSize: "1em",
+              }}
+            >
+              📥 Download Excel
+            </button>
             <button
-            onClick={downloadPaymentAsDocx}
-            style={{
-              border: "none",
-              background: "none",
-              color: "blue",
-              cursor: "pointer",
-              fontSize: "1em",
-            }}
-          >
-            {" "}
-            📥 Download docx
-          </button>
+              onClick={downloadPaymentAsDocx}
+              style={{
+                border: "none",
+                background: "none",
+                color: "blue",
+                cursor: "pointer",
+                fontSize: "1em",
+              }}
+            >
+              {" "}
+              📥 Download docx
+            </button>
           </div>
 
           <table className="table">
@@ -1251,56 +1468,61 @@ const AdminDashboard = () => {
         {/* Settings Section */}
         <div className="section" id="settings">
           <h2>Block slots </h2>
-          <p>Update your account settings, manage notifications, and customize the dashboard.</p>
-          <button onClick={handleLogout} className="btn1">Logout</button>
+          <p>
+            Update your account settings, manage notifications, and customize
+            the dashboard.
+          </p>
+          <button onClick={handleLogout} className="btn1">
+            Logout
+          </button>
 
           <h3>Update Profile</h3>
           <form onSubmit={handleSubmit}>
-        <div className="mb-2">
-          <label className="block font-medium">First Name</label>
-          <input
-            type="text"
-            name="ADMIN_FIRST_NAME"
-            value={admin.ADMIN_FIRST_NAME}
-            onChange={handleChange}
-            className="w-full p-2 border rounded"
-          />
-        </div>
-        <div className="mb-2">
-          <label className="block font-medium">Last Name</label>
-          <input
-            type="text"
-            name="ADMIN_LAST_NAME"
-            value={admin.ADMIN_LAST_NAME}
-            onChange={handleChange}
-            className="w-full p-2 border rounded"
-          />
-        </div>
-        <div className="mb-2">
-          <label className="block font-medium">Contact No</label>
-          <input
-            type="text"
-            name="ADMIN_CONTACT_NO"
-            value={admin.ADMIN_CONTACT_NO}
-            onChange={handleChange}
-            className="w-full p-2 border rounded"
-          />
-        </div>
-        <div className="mb-2">
-          <label className="block font-medium">Email</label>
-          <input
-            type="email"
-            name="ADMIN_EMAIL_ID"
-            value={admin.ADMIN_EMAIL_ID}
-            onChange={handleChange}
-            className="w-full p-2 border rounded"
-          />
-        </div>
+            <div className="mb-2">
+              <label className="block font-medium">First Name</label>
+              <input
+                type="text"
+                name="ADMIN_FIRST_NAME"
+                value={admin.ADMIN_FIRST_NAME}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <div className="mb-2">
+              <label className="block font-medium">Last Name</label>
+              <input
+                type="text"
+                name="ADMIN_LAST_NAME"
+                value={admin.ADMIN_LAST_NAME}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <div className="mb-2">
+              <label className="block font-medium">Contact No</label>
+              <input
+                type="text"
+                name="ADMIN_CONTACT_NO"
+                value={admin.ADMIN_CONTACT_NO}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <div className="mb-2">
+              <label className="block font-medium">Email</label>
+              <input
+                type="email"
+                name="ADMIN_EMAIL_ID"
+                value={admin.ADMIN_EMAIL_ID}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+              />
+            </div>
 
-        <button type="submit" className="btn1">
-          Save Changes
-        </button>
-      </form>
+            <button type="submit" className="btn1">
+              Save Changes
+            </button>
+          </form>
         </div>
       </div>
     </div>
