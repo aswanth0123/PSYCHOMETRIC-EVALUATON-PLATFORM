@@ -185,6 +185,16 @@ router.put('/:id', (req, res) => {
   });
 
 
-
+router.delete('/:id', (req, res) => {
+    const { id } = req.params;
+    const sql = 'DELETE FROM appointments_table WHERE APPOINTMENT_ID = ?';
+    db.query(sql, [id], (err, result) => {
+      if (err) {
+        console.error('Database Error:', err);
+        return res.status(500).json({ error: err.message });
+      }
+      res.json({ success: true, message: 'Appointment deleted successfully' });
+    });
+  });
 
 module.exports = router;

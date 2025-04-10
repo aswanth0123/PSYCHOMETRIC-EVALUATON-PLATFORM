@@ -870,6 +870,27 @@ const AdminDashboard = () => {
   
     saveAs(blob, "Evaluation_Report.xlsx");
   };
+  const handleDeleteAppointment = (id) => {
+    if (window.confirm("Are you sure you want to unblock this appointment?")) {
+      // Example using fetch:
+      fetch(`http://localhost:5000/api/appointments/${id}`, {
+        method: "DELETE",
+      })
+        .then((res) => {
+          if (res.ok) {
+            fetchData()
+            alert("Appointment Unblocked successfully");
+            // Optionally, refresh the list or update state
+          } else {
+            alert("Failed to delete appointment");
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          alert("An error occurred");
+        });
+    }
+  };
   
   return (
     <div>
@@ -1184,6 +1205,17 @@ const AdminDashboard = () => {
                     {new Date(appointment.TIME_SLOT).toLocaleTimeString()}
                   </td>
                   <td>{appointment.STATUS}</td>
+                  <td>
+                    {appointment.STATUS === "blocked" && (
+                      <button
+                        style={{backgroundColor: "green", color: "white", border: "none",padding: "5px 10px", borderRadius: "5px"}}
+
+                        onClick={() => handleDeleteAppointment(appointment.APPOINTMENT_ID)}
+                      >
+                        Unblock
+                      </button>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
